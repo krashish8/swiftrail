@@ -55,16 +55,30 @@
                         <li {% block navbar-book-ticket %}{% endblock %}><a href="{% url 'book-ticket' %}">Book Ticket</a></li>
                         <li {% block navbar-train-enquiry %}{% endblock %}>
                             <!-- First Tier Drop Down -->
-                            <label for="drop-2" class="toggle">Train Enquiry <span class="fa fa-angle-down" aria-hidden="true"></span> </label>
+                            <label for="drop-1" class="toggle">Train Enquiry <span class="fa fa-angle-down" aria-hidden="true"></span> </label>
                             <a href="{% url 'train-enquiry' %}">Train Enquiry <span class="fa fa-angle-down" aria-hidden="true"></span></a>
-                            <input type="checkbox" id="drop-2" />
+                            <input type="checkbox" id="drop-1" />
                             <ul>
                                 <li {% block navbar-train-search %}{% endblock %}><a href="{% url 'train-search' %}">Train between Stations</a></li>
                                 <li {% block navbar-train-schedule %}{% endblock %}><a href="{% url 'train-schedule' %}">Train Schedule</a></li>
                             </ul>
                         </li>
+                        {% if not user.is_authenticated %}
+                        <li {% block navbar-transactions %}{% endblock %}>
+                            <label for="drop-2" class="toggle">My Transactions <span class="fa fa-angle-down" aria-hidden="true"></span> </label>
+                            <a href="{% url 'transactions' %}">My Transactions <span class="fa fa-angle-down" aria-hidden="true"></span></a>
+                            <input type="checkbox" id="drop-2" />
+                            <ul>
+                                <li {% block navbar-last-transaction %}{% endblock %}><a href="{% url 'last-transaction' %}">Last Transaction Detail</a></li>
+                                <li {% block navbar-booked-history %}{% endblock %}><a href="{% url 'booked-history' %}">Booked Ticket History</a></li>
+                                <li {% block navbar-cancellation-history %}{% endblock %}><a href="{% url 'cancelled-history' %}">Ticket Cancellation History</a></li>
+                            </ul>
+                        </li>
+                        <li {% block navbar-profile %}{% endblock %}><a href="{% url 'profile' %}">My Profile</a></li>
+                        {% else %}
                         <li {% block navbar-login %}{% endblock %}><a href="{% url 'login' %}">Login</a></li>
                         <li {% block navbar-register %}{% endblock %}><a href="{% url 'register' %}">Register</a></li>
+                        {% endif %}
                         {% endblock %}
                     </ul>
                 </nav>
@@ -113,23 +127,23 @@
                     </ul>
                 </div>
                 <div class="col-lg-8 footer-right">
-                    <div class="row mx-0">
+                    <div class="row mx-0 justify-content-center">
                         <div class="col-md-4 ml-lg-4 footer-grid_section_w3layouts">
                             <h3 class="footer-title text-uppercase text-wh mb-lg-4 mb-3">Navigation</h3>
                             <ul class="list-unstyled w3layouts-icons">
                                 <li>
                                     <a href="{% url 'index' %}">Home</a>
                                 </li>
-                                <li class="mt-3">
+                                <li class="mt-2">
                                     <a href="{% url 'pnr-status' %}">PNR Status</a>
                                 </li>
-                                <li class="mt-3">
+                                <li class="mt-2">
                                     <a href="{% url 'book-ticket' %}">Book Tickets</a>
                                 </li>
-                                <li class="mt-3">
+                                <li class="mt-2">
                                     <a href="{% url 'train-search' %}">Train Between Stations</a>
                                 </li>
-                                <li class="mt-3">
+                                <li class="mt-2">
                                     <a href="{% url 'train-schedule' %}">Train Schedule</a>
                                 </li>
                             </ul>
@@ -138,15 +152,15 @@
                             <h3 class="footer-title text-uppercase text-wh mb-lg-4 mb-3">Contact Us</h3>
                             <div class="contact-info">
                                 <div class="footer-address-inf">
-                                    <h4 class="ad-info mb-2">Phone</h4>
+                                    <h4 class="ad-info">Phone</h4>
                                     <p>+91 90000-00000</p>
                                 </div>
-                                <div class="footer-address-inf my-4">
-                                    <h4 class="ad-info mb-2">Email </h4>
+                                <div class="footer-address-inf">
+                                    <h4 class="ad-info">Email </h4>
                                     <p><a href="mailto:info@swiftrail.com">info@swiftrail.com</a></p>
                                 </div>
                                 <div class="footer-address-inf">
-                                    <h4 class="ad-info mb-2">Location</h4>
+                                    <h4 class="ad-info">Location</h4>
                                     <p>Varanasi, Uttar Pradesh</p>
                                 </div>
                             </div>
@@ -154,8 +168,8 @@
 
 
                     </div>
-                    <div class="cpy-right text-left row">
-                        <p class="col-md-10">© 2019 SwiftRail. All rights reserved
+                    <div class="cpy-right row">
+                        <p class="col-md-10" style="text-align: center;">© 2019 SwiftRail. All rights reserved
                         </p>
                         <!-- move top icon -->
                         <a href="#" class="move-top text-right col-md-2"><span class="fa fa-long-arrow-up" aria-hidden="true"></span></a>
@@ -171,6 +185,7 @@
     <script src="{% static 'js/jquery.min.js' %}" type="text/javascript"></script>
     <script src="{% static 'js/jquery-ui.min.js' %}" type="text/javascript"></script>
     <script src="{% static 'js/main.js' %}" type="text/javascript"></script>
+    {% block script %} {% endblock %}
 </body>
 
 </html>

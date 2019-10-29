@@ -1131,11 +1131,11 @@ ul.w3layouts-icons li a {
 
 .footer-right {
     border-left: 1px solid #ddd;
-    padding: 1em 0em 3em 2em;
+    padding: 0em 0em 3em 2em;
 }
 
 .footer-grid_section_w3layouts {
-    padding: 3em 0;
+    padding: 3em 0 1em;
 }
 .contact-info a {
     color: #777;
@@ -1505,7 +1505,7 @@ a#btn-pnr {
     width: 40%;
 }
 
-a#btn-login:hover, a#btn-register:hover, a#btn-pnr:hover {
+a#btn-login:hover, a#btn-register:hover, a#btn-pnr:hover a#btn-train-schedule:hover {
     background: #0e9be1;
     color: white;
 }

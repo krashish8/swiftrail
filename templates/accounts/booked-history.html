@@ -1,0 +1,44 @@
+{% extends '../base.html' %}
+
+{% block title %} My Transactions {% endblock %}
+{% block navbar-transactions %}class="active"{% endblock %}
+{% block navbar-last-transaction %}class="inactive"{% endblock %}
+{% block navbar-cancellation-history %}class="inactive"{% endblock %}
+
+{% block banner %} main-banner inner {% endblock %}
+
+{% block content %}
+
+<ol class="breadcrumb">
+    <li class="breadcrumb-item"><a href="{% url 'index' %}">Home</a></li>
+    <li class="breadcrumb-item active"><a href="{% url 'transactions' %}">My Transactions</a></li>
+    <li class="breadcrumb-item active">Booked Ticket History</li>
+</ol>
+
+<!-- ticket booking form -->
+<div class="section text-center py-5">
+    <div class="container">
+        <div style="margin-top:30px;" class="mainbox ">
+            <div class="panel panel-info">
+                <div class="panel-body">
+                    <form id="book-ticket-form" class="form-horizontal" action="" method="post">
+                        {% csrf_token %}
+                        <div id="book-ticket-alert" style="display:none" class="alert alert-danger">
+                            <p>Error:</p>
+                            <span></span>
+                        </div>
+                        <div class="form-group">
+                            <div class="container">
+                                <div class="row">
+
+                                </div>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<!--//ticket booking form ends here-->
+{% endblock %}
