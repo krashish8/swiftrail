@@ -1493,21 +1493,17 @@ a.move-top span {
     border-color: #34c663;
 }
 
-a#btn-login {
+a#btn-login, a#btn-register {
     width: 33%;
 }
 
-a#btn-register {
-    width: 33%;
-}
-
-a#btn-pnr {
+a#btn-pnr, a#btn-train-schedule, a#btn-train-search {
     width: 40%;
 }
 
-a#btn-login:hover, a#btn-register:hover, a#btn-pnr:hover a#btn-train-schedule:hover {
+a#btn-login:hover, a#btn-register:hover, a#btn-pnr:hover, a#btn-train-schedule:hover, a#btn-train-search:hover {
     background: #0e9be1;
-    color: white;
+    color: white;   
 }
 
 button#btn-signup {

@@ -63,7 +63,7 @@
                                 <li {% block navbar-train-schedule %}{% endblock %}><a href="{% url 'train-schedule' %}">Train Schedule</a></li>
                             </ul>
                         </li>
-                        {% if not user.is_authenticated %}
+                        {% if user.is_authenticated %}
                         <li {% block navbar-transactions %}{% endblock %}>
                             <label for="drop-2" class="toggle">My Transactions <span class="fa fa-angle-down" aria-hidden="true"></span> </label>
                             <a href="{% url 'transactions' %}">My Transactions <span class="fa fa-angle-down" aria-hidden="true"></span></a>
