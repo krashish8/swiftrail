@@ -28,9 +28,18 @@
                     </div>
                 </div>
                 <div style="padding-top:30px" class="panel-body">
-                    <div style="display:none" id="login-alert" class="alert alert-danger col-sm-12"></div>
                     <form id="loginform" class="form-horizontal" action="" method="post">
                         {% csrf_token %}
+                        {% if messages %}
+                        {% for message in messages %}
+                        <div class="message">
+                            <div class="alert alert-{{message.tags}} alert-dismissible text-center" role="alert">
+                                <button type="button" class="close" data-dismiss="alert" aria-label="Close" onclick="$('.alert').remove()">&times;</button>
+                                {{message}}
+                            </div>
+                        </div>
+                        {% endfor %}
+                        {% endif %}
                         <div class="input-group">
                             <span class="input-group-addon">
                                 <i class="fa fa-user" style="margin: 15px 15px;"></i>
@@ -44,17 +53,11 @@
                             </span>
                             <input id="login-password" type="password" class="form-control" name="password" placeholder="Password" required>
                         </div>
-                        {% if messages %}
-                        <ul>
-                        {% for i in messages %}
-                        <li class="{{ message.tags }}">{{i}}</li>
-                        {% endfor %}
-                        </ul>
-                        {% endif %}
+
                         <div style="margin-top:10px" class="form-group">
                             <!-- Button -->
                             <div class="col-sm-12 controls">
-                                <a id="btn-login" class="btn active">Login </a>
+                                <button type="submit" id="btn-login" class="btn active">Login </button>
                             </div>
                         </div>
                         <div class="form-group">
@@ -67,13 +70,6 @@
                                 </div>
                             </div>
                         </div>
-                        {% if messages %}
-                        <ul>
-                            {% for i in messages %}
-                            <li>{{i}}</li>
-                        {% endfor %}
-                        </ul>
-                        {% endif %}
                     </form>
                 </div>
             </div>
@@ -81,4 +77,18 @@
     </div>
 </div>
 <!--//login and register form ends here-->
+{% endblock %}
+
+{% block script %}
+
+{% if messages %}
+{% for message in messages %}
+    window.setTimeout(function () {
+        $(".alert-{{message.tags}}").fadeTo(1000, 0).slideUp(500, function () {
+            $(this).remove();
+        });
+    }, 2000);
+{% endfor %}
+{% endif %}
+
 {% endblock %}

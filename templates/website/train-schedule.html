@@ -1,4 +1,5 @@
 {% extends '../base.html' %}
+{% load train %}
 
 {% block title %} Train Schedule {% endblock %}
 
@@ -23,10 +24,16 @@
                 <div class="panel-body">
                     <form id="train-schedule-form" class="form-horizontal" action="" method="post">
                         {% csrf_token %}
-                        <div id="train-schedule-alert" style="display:none" class="alert alert-danger">
-                            <p>Error:</p>
-                            <span></span>
+                        {% if messages %}
+                        {% for message in messages %}
+                        <div class="message">
+                            <div class="alert alert-{{message.tags}} alert-dismissible text-center" role="alert">
+                                <button type="button" class="close" data-dismiss="alert" aria-label="Close" onclick="$('.alert').remove()">&times;</button>
+                                {{message}}
+                            </div>
                         </div>
+                        {% endfor %}
+                        {% endif %}
                         <div class="form-group">
                             <div class="container">
                                 <div class="row">
@@ -36,7 +43,7 @@
                                     </div>
                                     <!-- Button -->
                                     <div class="col-md-4 col-sm-4 col-xs-4 controls">
-                                        <a id="btn-train-schedule" class="btn active float-left">Get Schedule</a>
+                                        <button type="submit" id="btn-train-schedule" class="btn active float-left">Get Schedule</button>
                                     </div>
                                 </div>
                             </div>
@@ -44,6 +51,7 @@
                     </form>
                 </div>
             </div>
+            {% if is_valid_post %}
             <div class="panel panel-info">
                 <div style="padding-top:20px" class="panel-body">
                     <div class="container">
@@ -52,33 +60,20 @@
                                 <table class="table table-bordered">
                                     <thead class="thead-blue">
                                         <tr>
-                                            <th rowspan="2">Train Number</th>
-                                            <th rowspan="2">Train Name</th>
-                                            <th rowspan="2">Source</th>
-                                            <th colspan="7">Runs On</th>
-                                        </tr>
-                                        <tr>
-                                            <th>MON</th>
-                                            <th>TUE</th>
-                                            <th>WED</th>
-                                            <th>THU</th>
-                                            <th>FRI</th>
-                                            <th>SAT</th>
-                                            <th>SUN</th>
+                                            <th>Train Number</th>
+                                            <th>Train Name</th>
+                                            <th>Source</th>
+                                            <th>Destination</th>
+                                            <th>Runs On</th>
                                         </tr>
                                     </thead>
                                     <tbody>
                                         <tr>
-                                            <td>TRAIN NO</td>
-                                            <td>TRAIN NAME</td>
-                                            <td>SOURCE</td>
-                                            <td>N</td>
-                                            <td>N</td>
-                                            <td>N</td>
-                                            <td>N</td>
-                                            <td>N</td>
-                                            <td>N</td>
-                                            <td>N</td>
+                                            <td>{{ train.train_no }}</td>
+                                            <td>{{ train.train_name }}</td>
+                                            <td>{{ train.source }}</td>
+                                            <td>{{ train.destination }}</td>
+                                            <td>{{ train.run_days }}</td>
                                         </tr>
                                     </tbody>
                                 </table>
@@ -100,26 +95,18 @@
                                         </tr>
                                     </thead>
                                     <tbody>
+                                        {% for schedule in schedules %}
                                         <tr>
-                                            <td>1</td>
-                                            <td>STATION CODE</td>
-                                            <td>STATION NAME</td>
-                                            <td>TIME</td>
-                                            <td>TIME</td>
-                                            <td>TIME</td>
-                                            <td>0</td>
-                                            <td>1</td>
+                                            <td>{{ forloop.counter }}</td>
+                                            <td>{{ schedule.station.station_code }}</td>
+                                            <td>{{ schedule.station.station_name }}</td>
+                                            <td>{{ schedule.arrival }}</td>
+                                            <td>{{ schedule.departure }}</td>
+                                            <td>{{ schedule|get_delay }}</td>
+                                            <td>{{ schedule.distance }}</td>
+                                            <td>{{ schedule.day }}</td>
                                         </tr>
-                                        <tr>
-                                            <td>2</td>
-                                            <td>STATION CODE</td>
-                                            <td>STATION NAME</td>
-                                            <td>TIME</td>
-                                            <td>TIME</td>
-                                            <td>TIME</td>
-                                            <td>0</td>
-                                            <td>1</td>
-                                        </tr>
+                                        {% endfor %}
                                     </tbody>
                                 </table>
                             </div>
@@ -127,8 +114,23 @@
                     </div>
                 </div>
             </div>
+            {% endif %}
         </div>
     </div>
 </div>
 <!--//train schedule form ends here-->
+{% endblock %}
+
+{% block script %}
+
+{% if messages %}
+{% for message in messages %}
+    window.setTimeout(function () {
+        $(".alert-{{message.tags}}").fadeTo(1000, 0).slideUp(500, function () {
+            $(this).remove();
+        });
+    }, 2000);
+{% endfor %}
+{% endif %}
+
 {% endblock %}
