@@ -7,7 +7,7 @@ class Profile(models.Model):
         ('F', 'Female'),
         ('O', 'Others/Not Specified'),
     )
-    user = models.OneToOneField(User, on_delete=models.CASCADE)
+    user = models.OneToOneField(User, on_delete=models.CASCADE, primary_key=True)
     gender = models.CharField(max_length=1, choices=GENDER_CHOICES)
     phone_number = models.CharField(max_length=10)
     date_of_birth = models.DateField()

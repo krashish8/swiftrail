@@ -71,8 +71,8 @@
                                         <tr>
                                             <td>{{ train.train_no }}</td>
                                             <td>{{ train.train_name }}</td>
-                                            <td>{{ train.source }}</td>
-                                            <td>{{ train.destination }}</td>
+                                            <td>{{ train.source_id }}</td>
+                                            <td>{{ train.destination_id }}</td>
                                             <td>{{ train.run_days }}</td>
                                         </tr>
                                     </tbody>
@@ -98,8 +98,8 @@
                                         {% for schedule in schedules %}
                                         <tr>
                                             <td>{{ forloop.counter }}</td>
-                                            <td>{{ schedule.station.station_code }}</td>
-                                            <td>{{ schedule.station.station_name }}</td>
+                                            <td>{{ schedule.station_code }}</td>
+                                            <td>{{ schedule.station_name }}</td>
                                             <td>{{ schedule.arrival }}</td>
                                             <td>{{ schedule.departure }}</td>
                                             <td>{{ schedule|get_delay }}</td>

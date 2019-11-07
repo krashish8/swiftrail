@@ -6,6 +6,7 @@ from django.core.validators import validate_email
 from django.core.exceptions import ValidationError
 import datetime
 from .models import *
+from django.db import connection
 
 app_name = 'accounts/'
 
@@ -62,7 +63,6 @@ def register(request):
         context['date_of_birth'] = date_of_birth
         context['phone_number'] = phone_number
         context['address'] = address
-        print(date_of_birth)
 
         if password1 == password2:
             if not username.isalnum():
@@ -81,11 +81,12 @@ def register(request):
                 messages.error(request, 'Select a valid gender')
             elif not validateDate(date_of_birth):
                 messages.error(request, 'Enter a valid Date of Birth')
-            elif not phone_number.isnumeric() or phone_number[0] < '6':
+            elif not phone_number.isnumeric() or phone_number[0] < '6' or len(phone_number) != 10:
                 messages.error(request, 'Enter a valid 10 digit phone number')
             else:
                 user = User.objects.create_user(username=username.lower(), password=password1, email=email.lower(), first_name=first_name, last_name=last_name)
-                Profile.objects.create(username=user, gender=gender, phone_number=phone_number, date_of_birth=date_of_birth, address=address)
+                with connection.cursor() as cursor:
+                    cursor.execute(f"INSERT INTO `accounts_profile` (`user_id`, `gender`, `phone_number`, `date_of_birth`, `address`) VALUES ('{user.id}', '{gender}', '{phone_number}', '{date_of_birth}', '{address}')")
                 messages.success(request, 'Registration successful! Please log in.')
                 return redirect('login')
         else:
