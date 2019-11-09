@@ -475,13 +475,13 @@ li > a:only-child:after {
     background: #eee;
 }
 
-a.btn.active {
+a.btn.active, button.btn.active {
     background: #10adfb;
     color: #fff;
     border: #10adfb;
 }
 
-a.btn.active.bluebtn:hover {
+a.btn.active.bluebtn:hover, button.btn.active.bluebtn:hover {
     background: #0e9be1;
 }
 
@@ -1493,15 +1493,15 @@ a.move-top span {
     border-color: #34c663;
 }
 
-a#btn-login, a#btn-register {
+button#btn-login, button#btn-register {
     width: 33%;
 }
 
-a#btn-pnr, a#btn-train-schedule, a#btn-train-search {
+button#btn-pnr, button#btn-train-schedule, button#btn-train-search {
     width: 40%;
 }
 
-a#btn-login:hover, a#btn-register:hover, a#btn-pnr:hover, a#btn-train-schedule:hover, a#btn-train-search:hover {
+button#btn-login:hover, button#btn-register:hover, button#btn-pnr:hover, button#btn-train-schedule:hover, button#btn-train-search:hover {
     background: #0e9be1;
     color: white;   
 }
@@ -1722,4 +1722,8 @@ h4.rad-txt span.abtxt1 {
 
 th[rowspan], th[colspan] {
     vertical-align: middle !important;
+}
+
+.alert {
+    margin-bottom: 1.5rem;
 }
