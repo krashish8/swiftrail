@@ -1,0 +1,90 @@
+{% extends '../base.html' %}
+
+{% block title %} Ticket Booking {% endblock %}
+{% block navbar-book-ticket %}class="active"{% endblock %}
+
+{% block banner %} main-banner inner {% endblock %}
+
+{% block content %}
+
+<ol class="breadcrumb">
+    <li class="breadcrumb-item"><a href="{% url 'index' %}">Home</a></li>
+    <li class="breadcrumb-item"><a href="{% url 'book-ticket' %}">Book Ticket</a></li>
+    <li class="breadcrumb-item active">Book Now</li>
+</ol>
+<div class="section text-center py-5">
+    <div class="container" style="padding-left: 10%; padding-right: 10%; padding-bottom: 1%">
+        <div class="row" style="border: thin solid black; padding:2%">
+            <div class="col-md-4" align="left">
+                <span>TRAIN NAME (NUMBER)</span>
+                <p>TIME</p>
+                <p  style="margin:0px;"> GORAKHPUR JN</p>
+                <p  style="margin:0px"> (GKP)</p>
+            </div>
+            <div class="col-md-4" align="center">
+                <p></p>
+                <table>
+                    <tr>
+                        <td style='width:200px;'><hr color="darkgrey"></td>
+                        <td> 01h:25m</td>
+                        <td style='width:200px'><hr color="darkgrey"></td>
+                    </tr>
+                </table>
+            </div>
+            <div class="col-md-4"align="right">
+                <span>DATE</span>
+                <p>TIME</p>
+                <p  style="margin:0px"> GORAKHPUR JN</p>
+                <p  style="margin:0px"> (GKP)</p>
+            </div>
+        </div>
+        <br>
+        <div align="left" style="padding-top:2%">
+            <label>PASSENGER(S) LIST</label>
+        </div>
+        <div class="row" style="border: 1px solid black; padding:2%">
+            <div class="col-md-1" align="left" style="padding-top:1%">
+                <label>1.</label>
+            </div>
+            <div class="col-md-5">
+                <input type="text" class="form-control" placeholder="Name">
+            </div>
+            <div class="col-md-2">
+                <input type="text" class="form-control" placeholder="Age">
+            </div>
+            <div class="col-md-3">
+                <select class="form-control">
+                    <option value="" selected disabled>Gender</option>
+                    <option>Male</option>
+                    <option>Female</option>
+                </select>
+            </div>
+        </div>
+        <div class="row">
+            <button type="button" class="btn btn-link" style="padding:0; padding-top: 2%">+ Add Passenger</button>
+        </div>
+        <div class="form-group">
+            <div class="container">
+                <table align="center" cellpadding="10">
+                    <tr>
+                        <td align="right"><b>Boarding Station</b></td>
+                        <td><input type="text" class="form-control"placeholder="Enter Boarding Station" required></td>
+                    </tr>
+                    <tr>
+                        <td align="right"><b>Mobile Number</b></td>
+                        <td><input type="text" class="form-control"placeholder="Enter Mobile Number" required></td>
+                    </tr>
+                </table>
+                <div class="row mt-4 justify-content-center">
+                    <div class="col-md-4 col-sm-4 col-xs-4" align="right" style="font-size:17.5px">
+                        <a><b> Total Fare : $250</b></a>
+                    </div>
+                    <div class="col-md-4 col-sm-4 col-xs-4" align="left"> 
+                        <a id="btn-train-search" class="btn btn-sm active" href="{% url 'transaction-success' %}">Proceed</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1672,7 +1672,14 @@ pre code {
   margin-bottom: 1rem;
   background-color: transparent;
 }
-
+.table-borderless > tbody > tr > td,
+.table-borderless > tbody > tr > th,
+.table-borderless > tfoot > tr > td,
+.table-borderless > tfoot > tr > th,
+.table-borderless > thead > tr > td,
+.table-borderless > thead > tr > th {
+    border: none;
+}
 .table th,
 .table td {
   padding: 0.75rem;
@@ -1952,6 +1959,24 @@ pre code {
 
 .table-responsive > .table-bordered {
   border: 0;
+}
+
+input[type="text2"],
+select.form-control-line {
+  background: transparent;
+  border: none;
+  border-bottom: 1px solid #000000;
+  -webkit-box-shadow: none;
+  box-shadow: none;
+  border-radius: 0;
+}
+
+input[type="text2"]:focus,
+select.form-control-line:focus {
+  -webkit-box-shadow: none;
+  box-shadow: none;
+  outline: none;
+  border-bottom: 1px solid #10adfb;
 }
 
 .form-control {
@@ -2503,14 +2528,14 @@ fieldset:disabled a.btn {
 
 .btn-primary {
   color: #fff;
-  background-color: #007bff;
-  border-color: #007bff;
+  background-color: #10adfb;
+  border-color: #10adfb;
 }
 
 .btn-primary:hover {
   color: #fff;
-  background-color: #0069d9;
-  border-color: #0062cc;
+  background-color: #0e9be1;
+  border-color: #0e9be1;
 }
 
 .btn-primary:focus, .btn-primary.focus {
@@ -5560,7 +5585,12 @@ button.close {
 
 @media (min-width: 992px) {
   .modal-lg {
-    max-width: 800px;
+    max-width: 900px;
+  }
+}
+@media (min-width: 992px) {
+  .modal-lg2 {
+    max-width: 550px;
   }
 }
 
