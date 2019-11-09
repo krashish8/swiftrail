@@ -15,11 +15,12 @@ def namedtuplefetchall(cursor):
     result = namedtuple('Result', [col[0] for col in desc])
     return [result(*row) for row in cursor.fetchall()]
 
-app_name = 'website/'
+app1_name = 'website/'
+app2_name = 'accounts/'
 
 
 def index(request):
-    return render(request, app_name + 'index.html')
+    return render(request, app1_name + 'index.html')
 
 
 def pnr_status(request):
@@ -42,11 +43,11 @@ def pnr_status(request):
                 cursor.execute(f"SELECT * FROM `website_passenger` WHERE `ticket_id` = '{ticket_obj.pnr}'")
                 passenger_obj = namedtuplefetchall(cursor)
             context['passengers'] = passenger_obj
-    return render(request, app_name + 'pnr-status.html', context=context)
+    return render(request, app1_name + 'pnr-status.html', context=context)
 
 
 def train_enquiry(request):
-    return render(request, app_name + 'train-enquiry.html')
+    return render(request, app1_name + 'train-enquiry.html')
 
 
 def train_schedule(request):
@@ -67,12 +68,21 @@ def train_schedule(request):
             context['train'] = train_obj
             context['schedules'] = schedule_obj
             print(schedule_obj)
-    return render(request, app_name + 'train-schedule.html', context=context)
+    return render(request, app1_name + 'train-schedule.html', context=context)
 
 
 def train_search(request):
-    return render(request, app_name + 'train-search.html')
+    return render(request, app1_name + 'train-search.html')
 
 
 def book_ticket(request):
-    return render(request, app_name + 'book-ticket.html')
+    return render(request, app1_name + 'book-ticket.html')
+
+def book_now(request):
+    return render(request, app1_name + 'book-now.html')
+
+def transaction_success(request):
+    return render(request, app1_name + 'transaction-success.html')
+
+def edit_profile(request):
+    return render(request, app2_name + 'edit-profile.html')

@@ -16,29 +16,101 @@
 </ol>
 
 <!-- ticket booking form -->
-<div class="section text-center py-5">
-    <div class="container">
-        <div style="margin-top:30px;" class="mainbox ">
-            <div class="panel panel-info">
-                <div class="panel-body">
-                    <form id="book-ticket-form" class="form-horizontal" action="" method="post">
-                        {% csrf_token %}
-                        <div id="book-ticket-alert" style="display:none" class="alert alert-danger">
-                            <p>Error:</p>
-                            <span></span>
-                        </div>
-                        <div class="form-group">
-                            <div class="container">
-                                <div class="row">
-
-                                </div>
-                            </div>
-                        </div>
-                    </form>
+<div class="container">
+    <div class="row" style="border: 1px solid black; font-size:16px; padding:2%">
+        <div class=col-md-2>
+            <div class="col-md-12" style="font-size:18px">
+                Weekday
+            </div>
+            <div class="row">
+                <div class="col-md-4" style="font-size:35px">
+                    02
+                </div>
+                <div class="col-md-8" style="font-size:18px">
+                    Oct <br>2019
                 </div>
             </div>
+            <div class="col-md-12" style="font-size:25px; color:red; transform: rotate(-5deg);">
+                <b>Cancelled</b>
+            </div>
+        </div>
+        <div class="col-md-10" style="font-size:15px">
+            <div class="row">
+                <div class="col-md-5">PNR Number: &nbsp;
+                <span><b>2530670749</b></span>
+                </div>
+                <div class="col-md-1"></div>
+                <div class="col-md-5">Cancellation ID: &nbsp;
+                <span><b>100000000000000</b></span>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-md-5">Train Number/Name: &nbsp;
+                <span><b>12538 / MUV MFP EXP</b></span>
+                </div>
+                <div class="col-md-1"></div>
+                <div class="col-md-5">Cancellation Date: &nbsp;
+                <span><b>02/10/2019</b></span>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-md-5">From: &nbsp;
+                <span><b>VARANASI JN (BSB)</b></span>
+                </div>
+                <div class="col-md-1"></div>
+                <div class="col-md-5">To: &nbsp;
+                <span><b>GORAKHPUR JN (GKP)</b></span>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-md-5">Booking Amount: &nbsp;
+                <span><b> $ 250</b></span>
+                </div>
+                <div class="col-md-1"></div>
+                <div class="col-md-5">Refund Amount: &nbsp;
+                <span><b> $ 100</b></span>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-md-5">Class: &nbsp;
+                <span><b>SL</b></span>
+                </div>
+                <div class="col-md-1"></div>
+                <div class="col-md-5">Quota: &nbsp;
+                <span><b>GEN</b></span>
+                </div>
+            </div>
+            <br>
+            <table class="table table-sm">
+                <thead>
+                    <tr>
+                    <th scope="col">#</th>
+                    <th scope="col">Name</th>
+                    <th scope="col">Age</th>
+                    <th scope="col">Gender</th>
+                    <th scope="col">Booking Status</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <th scope="">1</th>
+                        <td>A Kumar</td>
+                        <td>19</td>
+                        <td>Male</td>
+                        <td>CNF/B1/14/UB/GN</td>
+                    </tr>
+                    <tr>
+                        <th scope="row">2</th>
+                        <td>Sachin</td>
+                        <td>20</td>
+                        <td>Male</td>
+                        <td>CNF/B1/14/UB/GN</td>
+                    </tr>
+                </tbody>
+            </table>
         </div>
     </div>
 </div>
 <!--//ticket booking form ends here-->
+
 {% endblock %}

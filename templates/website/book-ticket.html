@@ -4,7 +4,7 @@
 {% block navbar-book-ticket %}class="active"{% endblock %}
 
 {% block banner %} main-banner inner {% endblock %}
-
+{% load static %}
 {% block content %}
 
 <ol class="breadcrumb">
@@ -12,30 +12,262 @@
     <li class="breadcrumb-item active">Book Ticket</li>
 </ol>
 
-<!-- ticket booking form -->
+<!-- train between stations form -->
 <div class="section text-center py-5">
-    <div class="container">
+    <div class="container-fluid">
         <div style="margin-top:30px;" class="mainbox ">
             <div class="panel panel-info">
                 <div class="panel-body">
-                    <form id="book-ticket-form" class="form-horizontal" action="" method="post">
+                    <form id="train-search-form" class="form-horizontal" action="" method="post">
                         {% csrf_token %}
-                        <div id="book-ticket-alert" style="display:none" class="alert alert-danger">
+                        <div id="train-search-alert" style="display:none" class="alert alert-danger">
                             <p>Error:</p>
                             <span></span>
                         </div>
                         <div class="form-group">
                             <div class="container">
                                 <div class="row">
-
+                                    <div class="col-md-1 col-sm-1 col-xs-1"></div>
+                                    <label class="col-md-4 col-sm-4 col-xs-4 control-label pr-5"><b>Journey Date:</b></label>
+                                    <div class="col-md-4 col-sm-4 col-xs-4">
+                                        <input type="date" class="form-control" name="date" placeholder="Enter Journey Date" required="">
+                                    </div>
+                                </div>
+                                <div class="row mt-2">
+                                    <div class="col-md-1 col-sm-1 col-xs-1"></div>
+                                    <label class="col-md-4 col-sm-4 col-xs-4 control-label pr-5"><b>Source Station:</b></label>
+                                    <div class="col-md-4 col-sm-4 col-xs-4">
+                                        <input type="text" class="form-control" name="source" placeholder="Enter Source Station Name" required="">
+                                    </div>
+                                </div>
+                                <div class="row mt-2">
+                                    <div class="col-md-1 col-sm-1 col-xs-1"></div>
+                                    <label class="col-md-4 col-sm-4 col-xs-4 control-label pr-5"><b>Destination Station:</b></label>
+                                    <div class="col-md-4 col-sm-4 col-xs-4">
+                                        <input type="text" class="form-control" name="destination" placeholder="Enter Destination Station Name" required="">
+                                    </div>
+                                </div>
+                                <div class="row mt-2">
+                                    <div class="col-md-1 col-sm-1 col-xs-1"></div>
+                                    <label class="col-md-4 col-sm-4 col-xs-4 control-label pr-5"><b>Flexible with Date:</b></label>
+                                    <div class="col-md-4 col-sm-4 col-xs-4">
+                                        <select class="form-control" name="flexible" required="">
+                                            <option value="no">No</option>
+                                            <option value="yes">Yes</option>
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="row mt-4 justify-content-center">
+                                    <div class="col-md-4 col-sm-4 col-xs-4 controls">
+                                        <a id="btn-train-search" class="btn active">Submit</a>
+                                    </div>
                                 </div>
                             </div>
                         </div>
                     </form>
                 </div>
             </div>
+            <div class="panel panel-info">
+                <div style="padding-top:20px" class="panel-body">
+                    <div class="container">
+                        <div class="row mt-2">
+                            <div class="col-md-12">
+                                <table class="table table-bordered">
+                                    <thead class="thead-blue">
+                                        <tr>
+                                            <th>S. No.</th>
+                                            <th>Train Number</th>
+                                            <th>Train Name</th>
+                                            <th>Departure Time</th>
+                                            <th>Arrival Time</th>
+                                            <th>Travel Time</th>
+                                            <th>Days of Run</th>
+                                            <th>Class</th>
+                                            <th>Availability & Fare</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr>
+                                            <td>1</td>
+                                            <td>TRAIN NO</td>
+                                            <td>TRAIN NAME</td>
+                                            <td>TIME</td>
+                                            <td>TIME</td>
+                                            <td>TIME</td>
+                                            <td>Mo, Tu, We, Th</td>
+                                            <td>
+                                                <select class="form-control" name="flexible" required="">
+                                                    <option>SL</option>
+                                                    <option>2A</option>
+                                                    <option>3A</option>
+                                                </select>
+                                            </td>
+                                            <td><a id="btn-train-search" class="btn btn-sm active">Get</a></td>
+                                        </tr>
+                                        <tr>
+                                            <td colspan="9">
+                                                <div class = "row">
+                                                    <div class = "col-md-2" style="padding-right:6px;" >
+                                                        <div class="product-shoe-info shoe text-center">
+                                                            <div>
+                                                            <span style="color:black; font-size:13.5px; font-weight:bold;">DATE (DAY)</span>
+                                                            <p style="color:green; font-size:13.5px;"><strong>AVAILABLE</strong></p>
+                                                            <a class="btn active" style="padding:5px; font-size:13.5px" href="{% url 'book-now' %}">Book Now</a>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                    <div class = "col-md-2" style="padding-left:6px; padding-right: 6px;" >
+                                                        <div class="product-shoe-info shoe text-center">
+                                                            <div>
+                                                            <span style="color:black; font-size:13.5px; font-weight:bold;">DATE (DAY)</span>
+                                                            <p style="color:#B22222; font-size:13.5px;"><strong>REGRET</strong></p>
+                                                            <a id="btn-train-search" class="btn active" style="visibility: hidden;padding:5px; font-size:13.5px">Book Now</a>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                    <div class = "col-md-2" style="padding-left:6px; padding-right: 6px;" >
+                                                        <div class="product-shoe-info shoe text-center">
+                                                            <div>
+                                                            <span style="color:black; font-size:13.5px; font-weight:bold;">DATE (DAY)</span>
+                                                            <p style="color:#B22222; font-size:13.5px;"><strong>REGRET</strong></p>
+                                                            <a id="btn-train-search" class="btn active" style="visibility: hidden;padding:5px; font-size:13.5px">Book Now</a>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                    <div class = "col-md-2" style="padding-left:6px; padding-right: 6px;" >
+                                                        <div class="product-shoe-info shoe text-center">
+                                                            <div>
+                                                            <span style="color:black; font-size:13.5px; font-weight:bold;">DATE (DAY)</span>
+                                                            <p style="color:#B22222; font-size:13.5px;"><strong>REGRET</strong></p>
+                                                            <a id="btn-train-search" class="btn active" style="visibility: hidden;padding:5px; font-size:13.5px">Book Now</a>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                    <div class = "col-md-2" style="padding-left:6px; padding-right: 6px;" >
+                                                        <div class="product-shoe-info shoe text-center">
+                                                            <div>
+                                                            <span style="color:black; font-size:13.5px; font-weight:bold;">DATE (DAY)</span>
+                                                            <p style="color:#B22222; font-size:13.5px;"><strong>REGRET</strong></p>
+                                                            <a id="btn-train-search" class="btn active" style="visibility: hidden;padding:5px; font-size:13.5px">Book Now</a>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                    <div class = "col-md-2" style="padding-left:6px;" >
+                                                        <div class="product-shoe-info shoe text-center">
+                                                            <div>
+                                                            <span style="color:black; font-size:13.5px; font-weight:bold;">DATE (DAY)</span>
+                                                            <p style="color:green; font-size:13.5px;"><strong>AVAILABLE</strong></p>
+                                                            <a class="btn active" style="padding:5px; font-size:13.5px" href="{% url 'book-now' %}">Book Now</a>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                    <tbody>
+                                        <tr>
+                                            <td>1</td>
+                                            <td>TRAIN NO</td>
+                                            <td>TRAIN NAME</td>
+                                            <td>TIME</td>
+                                            <td>TIME</td>
+                                            <td>TIME</td>
+                                            <td>Mo, Tu, We, Th</td>
+                                            <td>
+                                                <select class="form-control" name="flexible" required="">
+                                                    <option>SL</option>
+                                                    <option>2A</option>
+                                                    <option>3A</option>
+                                                </select>
+                                            </td>
+                                            <td><a id="btn-train-search" class="btn btn-sm active">Get</a></td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                        
+                        <div class="row mt-4 ml-1" style="text-align: center; font-size: 1.1rem">
+                            <b>ALTERNATE TRAINS:</b>
+                        </div>
+                        <div class="row mt-2">
+                            <div class="col-md-12">
+                                <table class="table table-bordered">
+                                    <thead class="thead-blue">
+                                        <tr>
+                                            <th>S. No.</th>
+                                            <th>Train Number</th>
+                                            <th>Train Name</th>
+                                            <th >Departure Time</th>
+                                            <th>Arrival Time</th>
+                                            <th>Travel Time</th>
+                                            <th>Days of Run</th>
+                                            <th>Classes</th>
+                                            <th>Availability & Fare</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr>
+                                            <td>1</td>
+                                            <td>TRAIN NO</td>
+                                            <td>TRAIN NAME</td>
+                                            <td>TIME</td>
+                                            <td>TIME</td>
+                                            <td>TIME</td>
+                                            <td>Mo, Tu, We, Th</td>
+                                            <td>
+                                                <select class="form-control" name="flexible" required="">
+                                                    <option>SL</option>
+                                                    <option>2A</option>
+                                                    <option>3A</option>
+                                                </select>
+                                            </td>
+                                            <td><a id="btn-train-search" class="btn btn-sm active">Get</a></td>
+                                        </tr>
+                                        <tr>
+                                            <td>1</td>
+                                            <td>TRAIN NO</td>
+                                            <td>TRAIN NAME</td>
+                                            <td>TIME</td>
+                                            <td>TIME</td>
+                                            <td>TIME</td>
+                                            <td>Mo, Tu, We, Th</td>
+                                            <td>
+                                                <select class="form-control" name="flexible" required="">
+                                                    <option>SL</option>
+                                                    <option>2A</option>
+                                                    <option>3A</option>
+                                                </select>
+                                            </td>
+                                            <td><a id="btn-train-search" class="btn btn-sm active">Get</a></td>
+                                        </tr>
+                                        <tr>
+                                            <td>1</td>
+                                            <td>TRAIN NO</td>
+                                            <td>TRAIN NAME</td>
+                                            <td>TIME</td>
+                                            <td>TIME</td>
+                                            <td>TIME</td>
+                                            <td>Mo, Tu, We, Th</td>
+                                            <td>
+                                                <select class="form-control" name="flexible" required="">
+                                                    <option>SL</option>
+                                                    <option>2A</option>
+                                                    <option>3A</option>
+                                                </select>
+                                            </td>
+                                            <td><a id="btn-train-search" class="btn btn-sm active">Get</a></td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
         </div>
     </div>
 </div>
-<!--//ticket booking form ends here-->
+<!--//train between stations form ends here-->
 {% endblock %}
