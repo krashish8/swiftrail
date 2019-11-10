@@ -6,7 +6,7 @@
 {% block navbar-cancellation-history %}class="inactive"{% endblock %}
 
 {% block banner %} main-banner inner {% endblock %}
-
+{% load static %}
 {% block content %}
 
 <ol class="breadcrumb">
@@ -36,7 +36,7 @@
                 </tbody>
             </table>
         </div>
-        <div class="row" style="border: thin solid black; padding:2%">
+        <div class="row shadow mb-5 rounded" style="border: 1px solid #ffd900;; padding:2%; background-color:#ffd900;">
             <div class="col-md-4" align="left">
                 <span>TRAIN NAME (NUMBER)</span><br>
                 <p style="margin:0px">DATE</p>
@@ -69,9 +69,9 @@
             </div>
         </div>
         <div align="left" style="padding-top:2%">
-            <label>PASSENGER(S) DETAILS</label>
+            <label><b>PASSENGER(S) DETAILS</b></label>
         </div>
-        <div class="row" style="border: thin solid black; padding:2%">
+        <div class="row shadow p-3 mb-3 bg-white rounded" style="border: 1px solid whitesmoke;">
             <div class="col-md-1" align="left">
                 <label>1.</label>
             </div>
@@ -88,7 +88,7 @@
                 <label>CNF/B1/14/UB</label>
             </div>
         </div>
-        <div class="row" style="border: thin solid black; padding:2%; border-top:0px">
+        <div class="row shadow p-3 mb-3 bg-white rounded" style="border: 1px solid whitesmoke;">
             <div class="col-md-1" align="left">
                 <label>1.</label>
             </div>
