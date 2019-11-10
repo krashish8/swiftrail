@@ -438,6 +438,22 @@ li > a:only-child:after {
     text-shadow: 2px 5px 3px rgba(0, 0, 0, 0.06);
 }
 
+.shadow-sm {
+  box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075) !important;
+}
+
+.shadow {
+  box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15) !important;
+}
+
+.shadow-lg {
+  box-shadow: 0 1rem 3rem rgba(0, 0, 0, 0.175) !important;
+}
+
+.shadow-none {
+  box-shadow: none !important;
+}
+
 .banner-info p {
     color: #fff;
     font-size: 0.8em;
@@ -1723,7 +1739,10 @@ h4.rad-txt span.abtxt1 {
 th[rowspan], th[colspan] {
     vertical-align: middle !important;
 }
+<<<<<<< HEAD
 
 .alert {
     margin-bottom: 1.5rem;
 }
+=======
+>>>>>>> ba8d0d1... css styling added
