@@ -1,4 +1,5 @@
 {% extends '../base.html' %}
+{% load train %}
 
 {% block title %} Ticket Booking {% endblock %}
 {% block navbar-book-ticket %}class="active"{% endblock %}
@@ -16,26 +17,26 @@
     <div class="container" style="padding-left: 10%; padding-right: 10%; padding-bottom: 1%">
         <div class="row shadow mb-2 rounded" style="border: 1px solid #ffffed; padding:2%; background-color:#ffffed;">
             <div class="col-md-4" align="left">
-                <span>TRAIN NAME (NUMBER)</span>
-                <p>TIME</p>
-                <p  style="margin:0px;"> GORAKHPUR JN</p>
-                <p  style="margin:0px"> (GKP)</p>
+                <span>{{ train.train_name }} ({{ train.train_no }})</span>
+                <p>{{ schedule_source.arrival }}</p>
+                <p  style="margin:0px;">{{ source|get_full_station_name }}</p>
+                <p  style="margin:0px"> ({{ source }})</p>
             </div>
             <div class="col-md-4" align="center">
                 <p></p>
                 <table>
                     <tr>
                         <td style='width:200px;'><hr color="darkgrey"></td>
-                        <td> 01h:25m</td>
+                        <td> {{ travel_time }}</td>
                         <td style='width:200px'><hr color="darkgrey"></td>
                     </tr>
                 </table>
             </div>
             <div class="col-md-4"align="right">
-                <span>DATE</span>
-                <p>TIME</p>
-                <p  style="margin:0px"> GORAKHPUR JN</p>
-                <p  style="margin:0px"> (GKP)</p>
+                <span>{{ journey_date }}</span>
+                <p>{{ schedule_destination.arrival }}</p>
+                <p  style="margin:0px;">{{ destination|get_full_station_name }}</p>
+                <p  style="margin:0px"> ({{ destination }})</p>
             </div>
         </div>
         <br>

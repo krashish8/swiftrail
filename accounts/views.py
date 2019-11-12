@@ -7,6 +7,13 @@ from django.core.exceptions import ValidationError
 import datetime
 from .models import *
 from django.db import connection
+from collections import namedtuple
+
+def namedtuplefetchall(cursor):
+    "Return all rows from a cursor as a namedtuple"
+    desc = cursor.description
+    result = namedtuple('Result', [col[0] for col in desc])
+    return [result(*row) for row in cursor.fetchall()]
 
 app_name = 'accounts/'
 
@@ -95,7 +102,29 @@ def register(request):
     return render(request, app_name + 'register.html', context=context)
 
 def profile(request):
-    return render(request, app_name + 'profile.html')
+    context = {}
+    if request.method == "POST":
+        old_password = request.POST['oldpassword']
+        new_password1 = request.POST['newpassword1']
+        new_password2 = request.POST['newpassword2']
+        user = auth.authenticate(request, username=request.user.username, password=old_password)
+        if user is not None:
+            if new_password1 != new_password2:
+                messages.error(request, "Confirmation Password did not match")
+            else:
+                user.set_password(new_password1)
+                user.save()
+                messages.success(request, "Password successfully changed")
+        else:
+            messages.error(request, "Old Password entered is incorrect")
+    with connection.cursor() as cursor:
+        cursor.execute(f"SELECT * FROM `accounts_profile` INNER JOIN `auth_user` ON (`accounts_profile`.`user_id` = `auth_user`.`id`) WHERE `auth_user`.`id` = '{request.user.id}'")
+        profile_obj = namedtuplefetchall(cursor)
+    context['profile'] = profile_obj[0]
+    return render(request, app_name + 'profile.html', context=context)
+
+def edit_profile(request):
+    return render(request, app_name + 'edit-profile.html')
 
 def transactions(request):
     return render(request, app_name + 'transactions.html')

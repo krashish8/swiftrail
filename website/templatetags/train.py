@@ -6,8 +6,9 @@ from collections import namedtuple
 
 register = template.Library()
 
+cursor = connection.cursor()
+
 def namedtuplefetchall(cursor):
-    "Return all rows from a cursor as a namedtuple"
     desc = cursor.description
     result = namedtuple('Result', [col[0] for col in desc])
     return [result(*row) for row in cursor.fetchall()]
@@ -21,9 +22,8 @@ BERTH = {
 
 @register.filter
 def get_berth(obj):
-    with connection.cursor() as cursor:
-        cursor.execute(f"SELECT * FROM `website_ticket` WHERE `pnr` = '{obj.ticket_id}'")
-        ticket_obj = namedtuplefetchall(cursor)[0]
+    cursor.execute(f"SELECT * FROM `website_ticket` WHERE `pnr` = '{obj.ticket_id}'")
+    ticket_obj = namedtuplefetchall(cursor)[0]
     if ticket_obj.class_type == "3A" or ticket_obj.class_type == "SL":
         seat = (obj.seat_no - 1) % 8
         return BERTH["3A"][seat]
@@ -49,3 +49,23 @@ def get_delay(obj):
         departure = datetime.datetime.combine(datetime.date.today() + datetime.timedelta(days=1), obj.departure)
     delay = departure - arrival
     return f'{delay.seconds//3600}:{(delay.seconds//60)%60}'
+
+@register.filter
+def get_travel_time(obj):
+    source_time = datetime.datetime.combine(datetime.date.today(), obj['source'][0])
+    day_diff = obj['destination'][1] - obj['source'][1]
+    destination_time = datetime.datetime.combine(datetime.date.today() + datetime.timedelta(days=day_diff), obj['destination'][0])
+    delay = destination_time - source_time
+    return f'{delay.seconds//3600}:{(delay.seconds//60)%60}'
+
+@register.filter
+def split(obj):
+    return obj.split(' ')
+
+@register.filter
+def get_full_station_name(obj):
+    cursor.execute(f"SELECT `station_name` FROM `website_station` WHERE `station_code` = '{obj}'")
+    station_name = cursor.fetchone()
+    print(1, station_name)
+
+    return station_name

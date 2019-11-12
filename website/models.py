@@ -1,5 +1,6 @@
 from django.db import models
 from accounts.models import *
+import datetime
 
 CLASS_CHOICES=(
     ('1A', '1A'),
@@ -34,18 +35,20 @@ class Train(models.Model):
     source = models.ForeignKey(Station, on_delete=models.CASCADE, related_name='train_source')
     destination = models.ForeignKey(Station, on_delete=models.CASCADE, related_name='train_destination')
     run_days = models.CharField(max_length=100)
+    classes = models.CharField(max_length=20)
 
     def __str__(self):
         return f'{self.train_no} - {self.train_name}'
 
 
 class TrainSeatChart(models.Model):
-    train = models.ForeignKey(Train, on_delete=models.CASCADE)
-    first_ac = models.IntegerField(verbose_name="1st AC")
-    second_ac = models.IntegerField(verbose_name="2nd AC")
-    third_ac = models.IntegerField(verbose_name="3rd AC")
-    sleeper = models.IntegerField()
-    chair_car = models.IntegerField()
+    train = models.OneToOneField(Train, on_delete=models.CASCADE, primary_key=True)
+    first_ac = models.IntegerField(verbose_name="1st AC", default=0)
+    second_ac = models.IntegerField(verbose_name="2nd AC", default=0)
+    third_ac = models.IntegerField(verbose_name="3rd AC", default=0)
+    sleeper = models.IntegerField(default=0)
+    chair_car = models.IntegerField(default=0)
+    journey_date = models.DateField()
 
     def get_1A(self, date):
         return self.first_ac - self.chart_tickets.filter(class_type="1A", date=date).count()
@@ -72,7 +75,7 @@ class TrainSchedule(models.Model):
     arrival = models.TimeField()
     departure = models.TimeField()
     distance = models.IntegerField()
-    day = models.IntegerField()
+    day = models.IntegerField(default=0)
 
     def __str__(self):
         return f'{self.train} at {self.station}'
@@ -80,7 +83,6 @@ class TrainSchedule(models.Model):
 
 class Ticket(models.Model):
     pnr = models.CharField(max_length=10, primary_key=True)
-    chart = models.ForeignKey(TrainSeatChart, on_delete=models.CASCADE, related_name='chart_tickets')
     transaction_id = models.CharField(max_length=20)
     ticket_from = models.ForeignKey(Station, on_delete=models.CASCADE, related_name='ticket_from')
     ticket_to = models.ForeignKey(Station, on_delete=models.CASCADE, related_name='ticket_to')
