@@ -1,5 +1,0 @@
-[client]
-database = swiftrail
-user = <username>
-password = <password>
-default-character-set = utf8
