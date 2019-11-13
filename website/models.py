@@ -7,14 +7,12 @@ CLASS_CHOICES=(
     ('2A', '2A'),
     ('3A', '3A'),
     ('SL', 'SL'),
-    ('CC', 'CC'),
 )
 
 BERTH = {
     "1A": ["LB", "UB"],
     "2A": ["LB", "UB", "SL", "SU"],
     "3A": ["LB", "MB", "UB", "LB", "MB", "UB", "SL", "SU"],
-    "CC": ["WS", "AS", "AS", "MS", "WS"],
 }
 
 
@@ -47,7 +45,6 @@ class TrainSeatChart(models.Model):
     second_ac = models.IntegerField(verbose_name="2nd AC", default=0)
     third_ac = models.IntegerField(verbose_name="3rd AC", default=0)
     sleeper = models.IntegerField(default=0)
-    chair_car = models.IntegerField(default=0)
     journey_date = models.DateField()
 
     def get_1A(self, date):
@@ -61,9 +58,6 @@ class TrainSeatChart(models.Model):
     
     def get_SL(self, date):
         return self.first_ac - self.chart_tickets.filter(class_type="SL", date=date).count()
-    
-    def get_CC(self, date):
-        return self.first_ac - self.chart_tickets.filter(class_type="CC", date=date).count()
     
     def __str__(self):
         return f'{self.train} CHART'
@@ -119,9 +113,6 @@ class Passenger(models.Model):
         elif self.ticket.class_type == "1A":
             seat = (self.seat_no - 1) % 2
             return BERTH["1A"][seat]
-        elif self.ticket.class_type == "CC":
-            seat = (self.seat_no - 1) % 5
-            return BERTH["CC"][seat]
 
     def __str__(self):
         return f'{self.ticket}, {self.ticket.class_type}/{self.seat_no}/{self.get_berth()}/GN'

@@ -126,14 +126,3 @@ def profile(request):
 def edit_profile(request):
     return render(request, app_name + 'edit-profile.html')
 
-def transactions(request):
-    return render(request, app_name + 'transactions.html')
-
-def last_transaction(request):
-    return render(request, app_name + 'last-transaction.html')
-
-def booked_history(request):
-    return render(request, app_name + 'booked-history.html')
-
-def cancelled_history(request):
-    return render(request, app_name + 'cancelled-history.html')

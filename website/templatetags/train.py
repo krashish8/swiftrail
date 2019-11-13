@@ -65,7 +65,22 @@ def split(obj):
 @register.filter
 def get_full_station_name(obj):
     cursor.execute(f"SELECT `station_name` FROM `website_station` WHERE `station_code` = '{obj}'")
-    station_name = cursor.fetchone()
-    print(1, station_name)
+    station_name = cursor.fetchone()[0]
 
     return station_name
+
+@register.filter
+def get_full_train_name(obj):
+    cursor.execute(f"SELECT `train_name` FROM `website_train` WHERE `train_no` = '{obj}'")
+    station_name = cursor.fetchone()[0]
+
+    return station_name
+
+@register.filter
+def get_full_gender(obj):
+    if obj == 'M':
+        return "Male"
+    elif obj == 'F':
+        return "Female"
+    else:
+        return "Others/Not Specified"

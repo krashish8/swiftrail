@@ -1,11 +1,19 @@
-from django.shortcuts import render, redirect
+from django.shortcuts import render, redirect, reverse, render_to_response
 from django.contrib import messages
 from .models import *
 from django.db import connection
 from collections import namedtuple
 from django.views.decorators.csrf import csrf_exempt
+from django.contrib.auth.decorators import login_required
 
-from datetime import date, datetime
+import datetime
+
+from random import randint
+
+def random_with_N_digits(n):
+    range_start = 10**(n-1)
+    range_end = (10**n)-1
+    return randint(range_start, range_end)
 
 cursor = connection.cursor()
 
@@ -74,12 +82,13 @@ def train_schedule(request):
 def train_search(request):
     return render(request, app_name + 'train-search.html')
 
+
+@login_required
 def book_ticket(request):
-    context = {"is_submit": False, "flexible":False, "train_search_page": True}
+    context = {"is_submit": False, "flexible":False}
 
 
-    if request.method == "POST" and request.POST.get("passenger_detail_page") != "True":
-        print(1)
+    if request.method == "POST":
         journey_date = request.POST.get("date")
         source = request.POST.get("source")
         destination = request.POST.get("destination")
@@ -88,7 +97,7 @@ def book_ticket(request):
         if flexible == "yes":
             context['flexible'] = True
 
-        day_number_source = datetime.strptime(journey_date, "%Y-%m-%d").weekday()  #Day Number for searched date
+        day_number_source = datetime.datetime.strptime(journey_date, "%Y-%m-%d").weekday()  #Day Number for searched date
 
         cursor.execute(f"SELECT T1.train_id, T1.day FROM website_trainschedule as T1, website_trainschedule as T2 WHERE T1.station_id='{source}' AND T2.station_id='{destination}' AND T1.distance < T2.distance AND T1.train_id=T2.train_id")
         search_flexible = namedtuplefetchall(cursor)
@@ -159,70 +168,118 @@ def book_ticket(request):
             context['source'] = source
             context['destination'] = destination
             context['journey_date'] = journey_date
-        print(context)
-
-    elif request.method == "POST" and request.POST.get("passenger_detail_page") == "True":
-        print(1)
-        context['passenger_detail_page'] = True
-        context['train_search_page'] = False
-        train_no = request.POST.get("train_no")
-        journey_date = request.POST.get("journey_date")
-        class_type = request.POST.get("class_type")
-        source = request.POST.get("source")
-        destination = request.POST.get("destination")
-        travel_time = request.POST.get("travel_time")
-        context = {
-            'train_no': train_no,
-            'journey_date': journey_date,
-            'class_type': class_type,
-            'source': source,
-            'destination': destination,
-            'travel_time': travel_time
-        }
-        cursor.execute(f"SELECT * FROM website_train WHERE train_no='{train_no}'")
-        train_obj = namedtuplefetchall(cursor)
-        cursor.execute(f"SELECT * FROM website_trainschedule WHERE train_id='{train_no}' AND station_id='{source}'")
-        schedule_source_obj = namedtuplefetchall(cursor)
-        cursor.execute(f"SELECT * FROM website_trainschedule WHERE train_id='{train_no}' AND station_id='{destination}'")
-        schedule_destination_obj = namedtuplefetchall(cursor)
-        context['train'] = train_obj
-        context['schedule_source'] = schedule_source_obj
-        context['schedule_destination'] = schedule_destination_obj
 
     return render(request, app_name + 'book-ticket.html', context=context)
 
-def book_now(request):
-    context = {}
+@login_required
+def book_now(request, train_no, journey_date, class_type, source, destination):
+    context = {
+        'train_no': train_no,
+        'journey_date': journey_date,
+        'class_type': class_type,
+        'source': source,
+        'destination': destination,
+    }
+    cursor.execute(f"SELECT * FROM website_train WHERE train_no='{train_no}'")
+    train_obj = namedtuplefetchall(cursor)
+    cursor.execute(f"SELECT * FROM website_trainschedule WHERE train_id='{train_no}' AND station_id='{source}'")
+    schedule_source_obj = namedtuplefetchall(cursor)
+    cursor.execute(f"SELECT * FROM website_trainschedule WHERE train_id='{train_no}' AND station_id='{destination}'")
+    schedule_destination_obj = namedtuplefetchall(cursor)
+    context['train'] = train_obj[0]
+    context['schedule_source'] = schedule_source_obj[0]
+    context['schedule_destination'] = schedule_destination_obj[0]
+
+    source_time = datetime.datetime.combine(datetime.date.today(), schedule_source_obj[0].arrival)
+    day_diff = schedule_destination_obj[0].day - schedule_source_obj[0].day
+    destination_time = datetime.datetime.combine(datetime.date.today() + datetime.timedelta(days=day_diff), schedule_destination_obj[0].arrival)
+    travel_time = destination_time - source_time
+    context['travel_time'] = travel_time
+    context['n'] = range(6)
     if request.method == "POST":
-        train_no = request.POST.get("train_no")
-        journey_date = request.POST.get("journey_date")
-        class_type = request.POST.get("class_type")
-        source = request.POST.get("source")
-        destination = request.POST.get("destination")
-        travel_time = request.POST.get("travel_time")
-        context = {
-            'train_no': train_no,
-            'journey_date': journey_date,
-            'class_type': class_type,
-            'source': source,
-            'destination': destination,
-            'travel_time': travel_time
-        }
-        cursor.execute(f"SELECT * FROM website_train WHERE train_no='{train_no}'")
-        train_obj = namedtuplefetchall(cursor)
-        cursor.execute(f"SELECT * FROM website_trainschedule WHERE train_id='{train_no}' AND station_id='{source}'")
-        schedule_source_obj = namedtuplefetchall(cursor)
-        cursor.execute(f"SELECT * FROM website_trainschedule WHERE train_id='{train_no}' AND station_id='{destination}'")
-        schedule_destination_obj = namedtuplefetchall(cursor)
-        context['train'] = train_obj
-        context['schedule_source'] = schedule_source_obj
-        context['schedule_destination'] = schedule_destination_obj
-    
-    print(context)
+        pnr = random_with_N_digits(5)
+        while Ticket.objects.filter(pnr=pnr):
+            pnr = random_with_N_digits(5)
+        rows = Ticket.objects.all().count()
+        transaction_id = 100000 + rows
+        today = datetime.datetime.today()
+        cursor.execute(f"INSERT INTO `website_ticket`(`pnr`, `transaction_id`, `journey_date`, `class_type`, `transaction_date`, `amount`, `booked_by_id`, `ticket_from_id`, `ticket_to_id`, `train_id`) VALUES ('{pnr}','{transaction_id}','{journey_date}','{class_type}','{today}','{150}','{request.user.id}','{source}','{destination}','{train_no}')")
+        cursor.execute("SELECT LAST_INSERT_ID()")
+        c = 0
+        for i in range(1, 7):
+            if request.POST.get("name" + str(i)) == "":
+                break
+            c = c + 1
+            name = request.POST.get("name" + str(i))
+            age = request.POST.get("age" + str(i))
+            gender = request.POST.get("gender" + str(i))
+            seat_number = random_with_N_digits(2)
+            cursor.execute(f"INSERT INTO `website_passenger`(`name`, `age`, `gender`, `seat_no`, `ticket_id`) VALUES ('{name}','{age}','{gender}','{seat_number}','{pnr}')")
+        return redirect(reverse('transaction-success', kwargs={'transaction_id':transaction_id}))
     
     return render(request, app_name + 'book-now.html', context=context)
-    # else:
-    #     return redirect('book-ticket')
 
-def transaction_success(request):
-    return render(request, app_name + 'transaction-success.html')
+# Custom function
+def get_transaction_detail(transaction_id):
+    cursor.execute(f"SELECT * FROM website_ticket WHERE transaction_id='{transaction_id}'")
+    ticket_obj = namedtuplefetchall(cursor)
+    train_no = ticket_obj[0].train_id
+    source = ticket_obj[0].ticket_from_id
+    destination = ticket_obj[0].ticket_to_id
+    cursor.execute(f"SELECT * FROM website_train WHERE train_no='{train_no}'")
+    train_obj = namedtuplefetchall(cursor)
+    cursor.execute(f"SELECT * FROM website_trainschedule WHERE train_id='{train_no}' AND station_id='{source}'")
+    schedule_source_obj = namedtuplefetchall(cursor)
+    cursor.execute(f"SELECT * FROM website_trainschedule WHERE train_id='{train_no}' AND station_id='{destination}'")
+    schedule_destination_obj = namedtuplefetchall(cursor)
+    context = {}
+    context['ticket'] = ticket_obj[0]
+    context['train'] = train_obj[0]
+    context['schedule_source'] = schedule_source_obj[0]
+    context['schedule_destination'] = schedule_destination_obj[0]
+    day_diff = schedule_destination_obj[0].day - schedule_source_obj[0].day
+    arrival_date = ticket_obj[0].journey_date + datetime.timedelta(days=day_diff)
+    context['arrival_date'] = arrival_date
+
+    source_time = datetime.datetime.combine(ticket_obj[0].journey_date, schedule_source_obj[0].arrival)
+    day_diff = schedule_destination_obj[0].day - schedule_source_obj[0].day
+    destination_time = datetime.datetime.combine(arrival_date, schedule_destination_obj[0].arrival)
+    travel_time = destination_time - source_time
+    context['travel_time'] = travel_time
+
+    cursor.execute(f"SELECT * FROM website_passenger WHERE ticket_id='{ticket_obj[0].pnr}'")
+    passenger_obj = namedtuplefetchall(cursor)
+    context['passengers'] = passenger_obj
+
+    return context
+
+
+@login_required
+def transaction_success(request, transaction_id):
+    context = get_transaction_detail(transaction_id)
+    return render(request, app_name + 'transaction-success.html', context=context)
+
+@login_required
+def transactions(request):
+    return render(request, app_name + 'transactions.html')
+
+@login_required
+def last_transaction(request):
+    cursor.execute(f"SELECT * FROM website_ticket WHERE booked_by_id='{request.user.id}' ORDER BY transaction_id DESC")
+    ticket_obj = namedtuplefetchall(cursor)
+    context = get_transaction_detail(ticket_obj[0].transaction_id)
+    return render(request, app_name + 'last-transaction.html', context=context)
+
+@login_required
+def booked_history(request):
+    print(request.user.id)
+    cursor.execute(f"SELECT * FROM website_ticket WHERE booked_by_id='{request.user.id}' ORDER BY transaction_id DESC")
+    ticket_obj = namedtuplefetchall(cursor)
+    all_tickets = []
+    for ticket in ticket_obj:
+        all_tickets.append(get_transaction_detail(ticket.transaction_id))
+    return render_to_response(app_name + 'booked-history.html', {'all_tickets': all_tickets})
+
+@login_required
+def cancelled_history(request):
+    return render(request, app_name + 'cancelled-history.html')

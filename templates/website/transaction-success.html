@@ -1,4 +1,5 @@
 {% extends '../base.html' %}
+{% load train %}
 
 {% block title %} Ticket Booking {% endblock %}
 {% block navbar-book-ticket %}class="active"{% endblock %}
@@ -10,7 +11,6 @@
 <ol class="breadcrumb">
     <li class="breadcrumb-item"><a href="{% url 'index' %}">Home</a></li>
     <li class="breadcrumb-item"><a href="{% url 'book-ticket' %}">Book Ticket</a></li>
-    <li class="breadcrumb-item"><a href="{% url 'book-now' %}">Book Now</a></li>
     <li class="breadcrumb-item active">Transaction Success</li>
 </ol>
 
@@ -20,77 +20,62 @@
     </div>
     <div class="container" style="padding-left: 10%; padding-right: 10%; padding-bottom: 1%; padding-top:1%">
         <div align="left">
-            <label>TRANSACTION ID : <b>100000000000000</b></label>
+            <label>TRANSACTION ID : <b>{{ ticket.transaction_id }}</b></label>
         </div>
         <div class="row shadow mb-5 rounded" style="border: 1px solid #ffffed; padding:2%; background-color:#ffffed;">
             <div class="col-md-4" align="left">
-                <span>TRAIN NAME (NUMBER)</span><br>
-                <p style="margin:0px">DATE</p>
-                <p>TIME</p>
-                <p  style="margin:0px;"> GORAKHPUR JN</p>
-                <p  style="margin:0px"> (GKP)</p>
+                <span>{{ train.train_no|get_full_train_name }}</span><br>
+                <p style="margin:0px">{{ ticket.journey_date }}</p>
+                <p>{{ schedule_source.arrival }}</p>
+                <p  style="margin:0px;"> {{ schedule_source.station_id|get_full_station_name }}</p>
+                <p  style="margin:0px"> ({{ schedule_source.station_id }})</p>
             </div>
             <div class="col-md-4" align="center">
                 <br><br>
                 <table>
                     <tr>
                         <td style='width:200px;'><hr color="darkgrey"></td>
-                        <td> 01h:25m</td>
+                        <td> {{ travel_time }}</td>
                         <td style='width:200px'><hr color="darkgrey"></td>
                     </tr>
                 </table>
             </div>
             <div class="col-md-4"align="right">
-                <span>PNR: <b>1000000000</b></span>
-                <p style="margin:0px">DATE</p>
-                <p>TIME</p>
-                <p  style="margin:0px"> GORAKHPUR JN</p>
-                <p  style="margin:0px"> (GKP)</p>
+                <span>PNR: <b>{{ ticket.pnr }}</b></span>
+                <p style="margin:0px">{{ arrival_date }}</p>
+                <p>{{ schedule_destination.arrival }}</p>
+                <p  style="margin:0px"> {{ schedule_destination.station_id|get_full_station_name }}</p>
+                <p  style="margin:0px"> ({{ schedule_destination.station_id }})</p>
             </div>
             <div class="col-md-12">
-                <label>Total Fare: <b>$200</b></label>&nbsp;|&nbsp;
-                <label>Date of Booking: <b>20/11/19</b></label>&nbsp;|&nbsp;
-                <label>Class: <b>SL</b></label>&nbsp;|&nbsp;
+                <label>Total Fare: <b>{{ ticket.amount }}</b></label>&nbsp;|&nbsp;
+                <label>Date of Booking: <b>{{ ticket.transaction_date }}</b></label>&nbsp;|&nbsp;
+                <label>Class: <b>{{ ticket.class_type }}</b></label>&nbsp;|&nbsp;
                 <label>Quota: <b>GEN</b></label>
             </div>
         </div>
         <div align="left" style="padding-top:2%">
             <label><b>PASSENGER(S) DETAILS</b></label>
         </div>
+        {% for passenger in passengers %}
         <div class="row shadow p-3 mb-3 bg-white rounded" style="border: 1px solid whitesmoke;">
             <div class="col-md-1" align="left">
-                <label>1.</label>
+                <label>{{ forloop.counter }}.</label>
             </div>
             <div class="col-md-3">
-                <label>Sachin Srivastava</label>
+                <label>{{ passenger.name }}</label>
             </div>
             <div class="col-md-2">
-                <label>19 Y</label>
+                <label>{{ passenger.age }} Y</label>
             </div>
             <div class="col-md-2">
-                <label>Male</label>
+                <label>{{ passenger.gender|get_full_gender }}</label>
             </div>
             <div class="col-md-4">
-                <label>CNF/B1/14/UB</label>
+                <label>CNF/{{ ticket.class_type }}/{{ passenger.seat_no }}/{{ passenger|get_berth }}/GN</label>
             </div>
         </div>
-        <div class="row shadow p-3 mb-3 bg-white rounded" style="border: 1px solid whitesmoke;">
-            <div class="col-md-1" align="left">
-                <label>1.</label>
-            </div>
-            <div class="col-md-3">
-                <label>Sachin Srivastava</label>
-            </div>
-            <div class="col-md-2">
-                <label>19 Y</label>
-            </div>
-            <div class="col-md-2">
-                <label>Male</label>
-            </div>
-            <div class="col-md-4">
-                <label>CNF/B1/14/UB</label>
-            </div>
-        </div>
+        {% endfor %}
     </div>
 </div>
 

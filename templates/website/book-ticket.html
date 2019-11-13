@@ -13,7 +13,6 @@
     <li class="breadcrumb-item active">Book Ticket</li>
 </ol>
 
-{% if train_search_page %}
 <!-- train between stations form -->
 <div class="section text-center py-5">
     <div class="container-fluid">
@@ -111,19 +110,17 @@
                                         <tr id="{{train.train_no}}">
                                             <td colspan="9">
                                                 <div class = "row">
-                                                    <div class = "col-md-1" ></div>
-                                                    
-                                                    <div class = "col-md-2" style="padding-right:6px;" >
+                                                    <div class = "col-md-3" style="padding-right:6px;" >
                                                         <div class="product-shoe-info shoe text-center">
                                                             <div>
                                                             <span style="color:black; font-size:13.5px; font-weight:bold;">1A</span>
                                                             <p style="color:green; font-size:13.5px;"><strong>{{ availability.first_ac }}</strong></p>
-                                                            <a id="book-{{ train.train_no }}-1a" class="btn active" style="padding:5px; font-size:13.5px">Book Now</a>
+                                                            <a id="book-{{ train.train_no }}-1a" class="btn active" style="padding:5px; font-size:13.5px" href="{% url 'book-now' train.train_no journey_date '1A' source destination %}">Book Now</a>
                                                             </div>
                                                         </div>
                                                     </div>
 
-                                                    <div class = "col-md-2" style="padding-right:6px;" >
+                                                    <div class = "col-md-3" style="padding-right:6px;" >
                                                         <div class="product-shoe-info shoe text-center">
                                                             <div>
                                                             <span style="color:black; font-size:13.5px; font-weight:bold;">2A</span>
@@ -133,7 +130,7 @@
                                                         </div>
                                                     </div>
 
-                                                    <div class = "col-md-2" style="padding-right:6px;" >
+                                                    <div class = "col-md-3" style="padding-right:6px;" >
                                                         <div class="product-shoe-info shoe text-center">
                                                             <div>
                                                             <span style="color:black; font-size:13.5px; font-weight:bold;">3A</span>
@@ -143,7 +140,7 @@
                                                         </div>
                                                     </div>
 
-                                                    <div class = "col-md-2" style="padding-right:6px;" >
+                                                    <div class = "col-md-3" style="padding-right:6px;" >
                                                         <div class="product-shoe-info shoe text-center">
                                                             <div>
                                                             <span style="color:black; font-size:13.5px; font-weight:bold;">SL</span>
@@ -153,17 +150,6 @@
                                                         </div>
                                                     </div>
 
-                                                    <div class = "col-md-2" style="padding-right:6px;" >
-                                                        <div class="product-shoe-info shoe text-center">
-                                                            <div>
-                                                            <span style="color:black; font-size:13.5px; font-weight:bold;">CC</span>
-                                                            <p style="color:green; font-size:13.5px;"><strong>{{ availability.chair_car }}</strong></p>
-                                                            <a id="book-{{ train.train_no }}-cc" class="btn active" style="padding:5px; font-size:13.5px">Book Now</a>
-                                                            </div>
-                                                        </div>
-                                                    </div>
-
-                                                    <div class = "col-md-2" style="padding-right:6px;" ></div>
                                                 </div>
                                             </td>
                                         </tr>
@@ -256,85 +242,6 @@
         </div>
     </div>
 </div>
-{% endif %}
-
-{% if passenger_detail_page %}
-<div class="section text-center py-5">
-    <div class="container" style="padding-left: 10%; padding-right: 10%; padding-bottom: 1%">
-        <div class="row shadow mb-2 rounded" style="border: 1px solid #ffffed; padding:2%; background-color:#ffffed;">
-            <div class="col-md-4" align="left">
-                <span>{{ train.train_name }} ({{ train.train_no }})</span>
-                <p>{{ schedule_source.arrival }}</p>
-                <p  style="margin:0px;">{{ source|get_full_station_name }}</p>
-                <p  style="margin:0px"> ({{ source }})</p>
-            </div>
-            <div class="col-md-4" align="center">
-                <p></p>
-                <table>
-                    <tr>
-                        <td style='width:200px;'><hr color="darkgrey"></td>
-                        <td> {{ travel_time }}</td>
-                        <td style='width:200px'><hr color="darkgrey"></td>
-                    </tr>
-                </table>
-            </div>
-            <div class="col-md-4"align="right">
-                <span>{{ journey_date }}</span>
-                <p>{{ schedule_destination.arrival }}</p>
-                <p  style="margin:0px;">{{ destination|get_full_station_name }}</p>
-                <p  style="margin:0px"> ({{ destination }})</p>
-            </div>
-        </div>
-        <br>
-        <div align="left" style="padding-top:2%">
-            <label><b>PASSENGER(S) LIST</b></label>
-        </div>
-        <div class="row shadow p-3 mb-3 bg-white rounded" style="border: 1px solid whitesmoke;">
-            <div class="col-md-1" align="left" style="padding-top:1%">
-                <label>1.</label>
-            </div>
-            <div class="col-md-5">
-                <input type="text" class="form-control" placeholder="Name">
-            </div>
-            <div class="col-md-2">
-                <input type="text" class="form-control" placeholder="Age">
-            </div>
-            <div class="col-md-3">
-                <select class="form-control">
-                    <option value="" selected disabled>Gender</option>
-                    <option>Male</option>
-                    <option>Female</option>
-                </select>
-            </div>
-        </div>
-        <div class="row">
-            <button type="button" class="btn btn-link" style="padding:0; padding-top: 2%">+ Add Passenger</button>
-        </div>
-        <div class="form-group">
-            <div class="container">
-                <table align="center" cellpadding="10">
-                    <tr>
-                        <td align="right"><b>Boarding Station</b></td>
-                        <td><input type="text" class="form-control"placeholder="Enter Boarding Station" required></td>
-                    </tr>
-                    <tr>
-                        <td align="right"><b>Mobile Number</b></td>
-                        <td><input type="text" class="form-control"placeholder="Enter Mobile Number" required></td>
-                    </tr>
-                </table>
-                <div class="row mt-4 justify-content-center">
-                    <div class="col-md-4 col-sm-4 col-xs-4" align="right" style="font-size:17.5px">
-                        <a><b> Total Fare : $250</b></a>
-                    </div>
-                    <div class="col-md-4 col-sm-4 col-xs-4" align="left"> 
-                        <a id="btn-train-search" class="btn btn-sm active" href="{% url 'transaction-success' %}">Proceed</a>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-</div>
-{% endif %}
 
 
 <!--//train between stations form ends here-->
@@ -351,121 +258,5 @@
     }, 2000);
 {% endfor %}
 {% endif %}
-
-{% for train, time, availability in t3 %}
-
-$("#book-{{ train.train_no }}-1a").click(function() {
-    $.ajax({
-        url:"{% url 'book-ticket' %}",
-		method:"POST",
-		data:{
-            "train_no": "{{ train.train_no }}",
-            "journey_date": "{{ journey_date }}",
-            "class_type": "1a",
-            "source": "{{ source }}",
-            "destination": "{{ destination }}",
-            "travel_time": "{{ time|get_travel_time }}",
-            'csrfmiddlewaretoken': $('[name="csrfmiddlewaretoken"]').val(),
-            "passenger_detail_page": "True"
-		},
-		success:function(data,status,xhr){
-		},
-		error:function(xhr,status,err){
-			alert("Some error occured");
-		}
-    })
-})
-
-$("#book-{{ train.train_no }}-2a").click(function() {
-    $.ajax({
-        url:"{% url 'book-ticket' %}",
-		method:"POST",
-		data:{
-            "train_no": "{{ train.train_no }}",
-            "journey_date": "{{ journey_date }}",
-            "class_type": "2a",
-            "source": "{{ source }}",
-            "destination": "{{ destination }}",
-            "travel_time": "{{ time|get_travel_time }}",
-            'csrfmiddlewaretoken': $('[name="csrfmiddlewaretoken"]').val(),
-            "passenger_detail_page": "True"
-		},
-		success:function(data,status,xhr){
-		},
-		error:function(xhr,status,err){
-			alert("Some error occured");
-		}
-    })
-})
-
-$("#book-{{ train.train_no }}-3a").click(function() {
-    $.ajax({
-        url:"{% url 'book-ticket' %}",
-		method:"POST",
-		data:{
-            "train_no": "{{ train.train_no }}",
-            "journey_date": "{{ journey_date }}",
-            "class_type": "3a",
-            "source": "{{ source }}",
-            "destination": "{{ destination }}",
-            "travel_time": "{{ time|get_travel_time }}",
-            'csrfmiddlewaretoken': $('[name="csrfmiddlewaretoken"]').val(),
-            "passenger_detail_page": "True"
-		},
-		success:function(data,status,xhr){
-		},
-		error:function(xhr,status,err){
-			alert("Some error occured");
-		}
-    })
-})
-
-$("#book-{{ train.train_no }}-sl").click(function() {
-    $.ajax({
-        url:"{% url 'book-ticket' %}",
-		method:"POST",
-		data:{
-            "train_no": "{{ train.train_no }}",
-            "journey_date": "{{ journey_date }}",
-            "class_type": "sl",
-            "source": "{{ source }}",
-            "destination": "{{ destination }}",
-            "travel_time": "{{ time|get_travel_time }}",
-            'csrfmiddlewaretoken': $('[name="csrfmiddlewaretoken"]').val(),
-            "passenger_detail_page": "True"
-		},
-		success:function(data,status,xhr){
-		},
-		error:function(xhr,status,err){
-			alert("Some error occured");
-		}
-    })
-})
-
-$("#book-{{ train.train_no }}-cc").click(function() {
-    $.ajax({
-        url:"{% url 'book-ticket' %}",
-		method:"POST",
-		data:{
-            "train_no": "{{ train.train_no }}",
-            "journey_date": "{{ journey_date }}",
-            "class_type": "cc",
-            "source": "{{ source }}",
-            "destination": "{{ destination }}",
-            "travel_time": "{{ time|get_travel_time }}",
-            'csrfmiddlewaretoken': $('[name="csrfmiddlewaretoken"]').val(),
-            "passenger_detail_page": "True"
-		},
-		success:function(data,status,xhr){
-		},
-		error:function(xhr,status,err){
-			alert("Some error occured");
-		}
-    })
-})
-
-{% endfor %}
-
-
 
 {% endblock %}

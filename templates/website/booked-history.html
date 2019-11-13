@@ -1,4 +1,5 @@
 {% extends '../base.html' %}
+{% load train %}
 
 {% block title %} My Transactions {% endblock %}
 {% block navbar-transactions %}class="active"{% endblock %}
@@ -15,19 +16,19 @@
     <li class="breadcrumb-item active">Booked Ticket History</li>
 </ol>
 
-<!-- ticket booking form -->
+{% for t in all_tickets %}
 <div class="container">
     <div class="row shadow p-3 mb-5 bg-white rounded" style="border: 1px solid whitesmoke; font-size:16px; padding:2%;">
         <div class=col-md-2>
             <div class="col-md-12" style="font-size:18px">
-                Weekday
+                <!-- Weekday -->
             </div>
             <div class="row">
                 <div class="col-md-4" style="font-size:35px">
-                    02
+                    <!-- 02 -->
                 </div>
                 <div class="col-md-8" style="font-size:18px">
-                    Oct <br>2019
+                    <!-- Oct <br>2019 -->
                 </div>
             </div>
             <div class="col-md-12" style="font-size:25px; color:#228B22; transform: rotate(-5deg);">
@@ -37,29 +38,29 @@
         <div class="col-md-10" style="font-size:15px">
             <div class="row">
                 <div class="col-md-5">PNR Number: &nbsp;
-                <span><b>2530670749</b></span>
+                <span><b>{{ t.ticket.pnr }}</b></span>
                 </div>
                 <div class="col-md-1"></div>
                 <div class="col-md-5">Transaction ID: &nbsp;
-                <span><b>100000000000000</b></span>
+                <span><b>{{ t.ticket.transaction_id }}</b></span>
                 </div>
             </div>
             <div class="row">
                 <div class="col-md-5">Train Number/Name: &nbsp;
-                <span><b>12538 / MUV MFP EXP</b></span>
+                <span><b>{{ t.train.train_no }} / {{ t.train.train_no|get_full_train_name }}</b></span>
                 </div>
                 <div class="col-md-1"></div>
                 <div class="col-md-5">Booking Date: &nbsp;
-                <span><b>02/10/2019</b></span>
+                <span><b>{{ t.ticket.transaction_date }}</b></span>
                 </div>
             </div>
             <div class="row">
                 <div class="col-md-5">From: &nbsp;
-                <span><b>VARANASI JN (BSB), 02/10/19</b></span>
+                <span><b>VARANASI JN (BSB), {{ t.journey_date }}, {{ t.schedule_source.arrival }}</b></span>
                 </div>
                 <div class="col-md-1"></div>
                 <div class="col-md-5">To: &nbsp;
-                <span><b>GORAKHPUR JN (GKP), 02/10/19, 11:35 Hrs</b></span>
+                <span><b>GORAKHPUR JN (GKP), {{ t.arrival_date }}, {{ t.schedule_destination.arrival }}</b></span>
                 </div>
             </div>
             <div class="row">
@@ -118,17 +119,17 @@
                 </tbody>
             </table>
         </div>
-        <table class="table table-borderless">
+        <!-- <table class="table table-borderless">
             <tbody>
                 <tr>
                     <td align="right" style="width:50%;"><button type="button" class="btn btn-primary btn-sm" data-target="#cancelTicket_modal" data-toggle="modal">Cancel Ticket</button></td>
                     <td align="left"><button type="button" class="btn btn-primary btn-sm">Print E-Ticket</button></td>
                 </tr>
             </tbody>
-        </table>
+        </table> -->
     </div>
 </div>
-<!--//ticket booking form ends here-->
+{% endfor %}
 
 <!-- Modal -->
 <div class="modal fade" id="cancelTicket_modal" tabindex="-1" role="dialog" aria-labelledby="cancelTicketTitle" aria-hidden="true">
