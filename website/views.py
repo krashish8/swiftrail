@@ -283,3 +283,6 @@ def booked_history(request):
 @login_required
 def cancelled_history(request):
     return render(request, app_name + 'cancelled-history.html')
+
+def emergency(request):
+    return render(request, app_name + 'emergency.html')
