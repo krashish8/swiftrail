@@ -286,3 +286,6 @@ def cancelled_history(request):
 
 def emergency(request):
     return render(request, app_name + 'emergency.html')
+
+def termsofservice(request):
+    return render(request, app_name + 'terms-of-service.html')
