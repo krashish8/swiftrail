@@ -16,4 +16,5 @@ urlpatterns = [
     path('transactions/booked/', views.booked_history, name='booked-history'),
     path('transactions/cancelled/', views.cancelled_history, name='cancelled-history'),
     path('emergency/', views.emergency, name='emergency'),
+    path('terms-of-service/', views.termsofservice, name='terms-of-service'),
 ]
