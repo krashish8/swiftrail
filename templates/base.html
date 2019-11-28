@@ -49,6 +49,7 @@
                         {% block navbar %}
                         <li {% block navbar-home %}{% endblock %}><a href="{% url 'index' %}">Home</a></li>
                         <li {% block navbar-pnr-status %}{% endblock %}><a href="{% url 'pnr-status' %}">PNR Status</a></li>
+                        <li {% block navbar-live-status %}{% endblock %}><a href="{% url 'live-status' %}">Live Status</a></li>
                         <li {% block navbar-book-ticket %}{% endblock %}><a href="{% url 'book-ticket' %}">Book Ticket</a></li>
                         <li {% block navbar-train-enquiry %}{% endblock %}>
                             <!-- First Tier Drop Down -->
@@ -62,7 +63,7 @@
                         </li>
                         {% if user.is_authenticated %}
                         <li {% block navbar-transactions %}{% endblock %}>
-                            <label for="drop-2" class="toggle">My Transactions <span class="fa fa-angle-down" aria-hidden="true"></span> </label>
+                            <label for="drop-2" class="toggle" style=>My Transactions <span class="fa fa-angle-down" aria-hidden="true"></span> </label>
                             <a href="{% url 'transactions' %}">My Transactions <span class="fa fa-angle-down" aria-hidden="true"></span></a>
                             <input type="checkbox" id="drop-2" />
                             <ul>
@@ -72,6 +73,10 @@
                             </ul>
                         </li>
                         <li {% block navbar-profile %}{% endblock %}>
+
+                            <label for="drop-3" class="toggle">{{user.first_name}}<span class="fa fa-angle-down" aria-hidden="true"></span> </label>
+                            <a href="{% url 'profile' %}">{{user.first_name}}<span class="fa fa-angle-down" aria-hidden="true"></span></a>
+
                             <label for="drop-3" class="toggle">My Profile <span class="fa fa-angle-down" aria-hidden="true"></span> </label>                     
                             <a href="{% url 'profile' %}">My Profile <span class="fa fa-angle-down" aria-hidden="true"></span></a>                            
                             <a class="btn"  href="{% url 'profile' %}">
@@ -79,11 +84,19 @@
                             </i>
                             </a>
                             </div>
+
                             <input type="checkbox" id="drop-3" />
+                            
                             <ul>
                                 <li {% block navbar-view-profile %}{% endblock %}><a href="{% url 'profile' %}">View Profile</a></li>
                                 <li {% block navbar-logout %}{% endblock %}><a href="{% url 'logout' %}">Logout</a></li>
                             </ul>
+                        </li>
+                        <li>
+                            <a class="btn"  href="{% url 'profile' %}">
+                            <i class="btn btn-primary" style= "display:block; height: 30px; width: 30px; border-radius: 50%; background-color: green; border: 1px solid green; justify-content: center; align-items: center; display: inline-flex; position: relative; bottom: 15px; right: 15px">{{user.first_name|slice:"1"}}
+                            </i>
+                            </a>
                         </li>
                         {% else %}
                         <li {% block navbar-login %}{% endblock %}><a href="{% url 'login' %}">Login</a></li>
