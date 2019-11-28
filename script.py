@@ -2,6 +2,7 @@ import os
 from django.core.wsgi import get_wsgi_application
 os.environ.setdefault("DJANGO_SETTINGS_MODULE", "swiftrail.settings")
 application = get_wsgi_application()
+import random
 
 from website.models import *
 
@@ -25,7 +26,28 @@ def create_ticket(pnr, train_no, transaction_id, ticket_from, ticket_to, journey
 def create_passenger(pnr, name, age, gender, seat_no):
     Passenger.objects.create(ticket=pnr, name=name, age=age, gender=gender, seat_no=seat_no)
 
+def update_station(station_code, manager, assistant_manager, rpf, deputy_rpf, head_officer):
+    Station.objects.filter(station_code=source_code).update(station_code='', manager='', assistant_manager='', rpf='', deputy_rpf='', head_officer='')
+
 # create_station("DHN", "DHANBAD")
 # create_station("BSB", "VARANASI")
 # create_train(13307, "GANGASUTLEJ EXPRESS", "DHN", "BSB", "SUN MON WED FRI", 0, 0, 20, 20, 0)
 # create_schedule(13307, "DHN", "15:30", "15:45", 0, 0)
+
+stations = Station.objects.all()
+for station in stations:
+    s = str(random.randint(6,9))
+    s = s + str(random.randint(109912309, 989790809))
+    Station.objects.filter(station_code=station.station_code).update(manager=s)
+    s = str(random.randint(6,9))
+    s = s + str(random.randint(109912309, 989790809))
+    Station.objects.filter(station_code=station.station_code).update(assistant_manager=s)
+    s = str(random.randint(6,9))
+    s = s + str(random.randint(109912309, 989790809))
+    Station.objects.filter(station_code=station.station_code).update(rpf=s)
+    s = str(random.randint(6,9))
+    s = s + str(random.randint(109912309, 989790809))
+    Station.objects.filter(station_code=station.station_code).update(deputy_rpf=s)
+    s = str(random.randint(6,9))
+    s = s + str(random.randint(109912309, 989790809))
+    Station.objects.filter(station_code=station.station_code).update(head_officer=s)

@@ -14,6 +14,8 @@ gunicorn = "*"
 whitenoise = "*"
 psycopg2-binary = "*"
 social-auth-app-django = "*"
+django-sslserver = "*"
+instamojo-wrapper = "*"
 
 [requires]
 python_version = "3.7"
