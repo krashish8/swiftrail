@@ -120,8 +120,38 @@ def profile(request):
     with connection.cursor() as cursor:
         cursor.execute(f"SELECT * FROM `accounts_profile` INNER JOIN `auth_user` ON (`accounts_profile`.`user_id` = `auth_user`.`id`) WHERE `auth_user`.`id` = '{request.user.id}'")
         profile_obj = namedtuplefetchall(cursor)
-    context['profile'] = profile_obj[0]
+    try:
+        context['profile'] = profile_obj[0]
+    except IndexError:
+        return redirect('create-profile')
     return render(request, app_name + 'profile.html', context=context)
+
+def create_profile(request):
+    context = {}
+    context['user'] = request.user
+    if request.method == "POST":
+        gender = request.POST.get('gender')
+        date_of_birth = request.POST.get('date_of_birth')
+        phone_number = request.POST.get('phone_number')
+        address = request.POST.get('address')
+        context['gender'] = gender
+        context['date_of_birth'] = date_of_birth
+        context['phone_number'] = phone_number
+        context['address'] = address
+
+        if gender not in ('M', 'F', 'O'):
+            messages.error(request, 'Select a valid gender')
+        elif not validateDate(date_of_birth):
+            messages.error(request, 'Enter a valid Date of Birth')
+        elif not phone_number.isnumeric() or phone_number[0] < '6' or len(phone_number) != 10:
+            messages.error(request, 'Enter a valid 10 digit phone number')
+        else:
+            with connection.cursor() as cursor:
+                cursor.execute(f"INSERT INTO `accounts_profile` (`user_id`, `gender`, `phone_number`, `date_of_birth`, `address`) VALUES ('{request.user.id}', '{gender}', '{phone_number}', '{date_of_birth}', '{address}')")
+            messages.success(request, 'Profile Successfully Created.')
+            return redirect('profile')
+        return render(request, app_name + 'register.html', context=context)
+    return render(request, app_name + 'create-profile.html', context=context)
 
 def edit_profile(request):
     return render(request, app_name + 'edit-profile.html')
