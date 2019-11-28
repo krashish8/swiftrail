@@ -40,7 +40,7 @@ class Train(models.Model):
 
 
 class TrainSeatChart(models.Model):
-    train = models.OneToOneField(Train, on_delete=models.CASCADE, primary_key=True)
+    train = models.ForeignKey(Train, on_delete=models.CASCADE,)
     first_ac = models.IntegerField(verbose_name="1st AC", default=0)
     second_ac = models.IntegerField(verbose_name="2nd AC", default=0)
     third_ac = models.IntegerField(verbose_name="3rd AC", default=0)

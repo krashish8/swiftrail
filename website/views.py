@@ -289,3 +289,20 @@ def emergency(request):
 
 def termsofservice(request):
     return render(request, app_name + 'terms-of-service.html')
+
+def live_status(request):
+    context = {'is_submit': False}
+    if request.method == "POST":
+        train_no = request.POST.get('train-no')
+        cursor.execute(f"SELECT * FROM `website_train` WHERE `train_no`='{train_no}'")
+        train_obj = namedtuplefetchall(cursor)
+        if not train_obj:
+            messages.error(request, 'The given Train Number does not exist.')
+        else:
+            context['is_submit'] = True
+            train_obj = train_obj[0]
+            cursor.execute(f"SELECT * FROM `website_trainschedule` INNER JOIN `website_station` ON (`website_trainschedule`.`station_id` =`website_station`.`station_code`) WHERE `train_id`='{train_no}' ORDER BY distance ASC")
+            schedule_obj = namedtuplefetchall(cursor)
+            context['train'] = train_obj
+            context['schedules'] = schedule_obj
+    return render(request, app_name + 'live-status.html', context=context)
