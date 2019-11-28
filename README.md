@@ -13,7 +13,7 @@ This is the repository for the ITW-II Project - Railway Management System.
 ## Running the project
 
  - Create database `swiftrail` using the command `CREATE DATABASE swiftrail;` by logging in to `MySQL`.
- - Rename `my.cnf.example` as `my.cnf` and enter the `username` of the MySQL User in `<username>` and `password` in `<password>`.
+ - <b>Copy</b> `my.cnf.example` as `my.cnf` and enter the `username` of the MySQL User in `<username>` and `password` in `<password>`.
  - Run `python manage.py makemigrations` for creating new migrations
  - Run `python manage.py migrate` to apply migrations.
  - Start the development server using `python manage.py runserver`.
