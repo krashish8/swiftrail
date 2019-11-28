@@ -59,8 +59,8 @@
                 <span>PNR: <b>{{ ticket.pnr }}</b></span>
                 <p style="margin:0px">{{ arrival_date }}</p>
                 <p>{{ schedule_destination.arrival }}</p>
-                <p  style="margin:0px"> {{ schedule_destination.station_id|get_full_station_name }}</p>
-                <p  style="margin:0px"> ({{ schedule_destination.station_id }})</p>
+                <p style="margin:0px"> {{ schedule_destination.station_id|get_full_station_name }}</p>
+                <p style="margin:0px"> ({{ schedule_destination.station_id }})</p>
             </div>
             <div class="col-md-12">
                 <label>Total Fare: <b>{{ ticket.amount }}</b></label>&nbsp;|&nbsp;

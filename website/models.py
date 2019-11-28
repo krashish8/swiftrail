@@ -19,6 +19,12 @@ BERTH = {
 class Station(models.Model):
     station_code = models.CharField(max_length=10, primary_key=True)
     station_name = models.CharField(max_length=30)
+    # location = models.CharField
+    manager = models.CharField(max_length=10, default='')
+    assistant_manager = models.CharField(max_length=10, default='')
+    rpf = models.CharField(max_length=10, default='')
+    deputy_rpf = models.CharField(max_length=10, default='')
+    head_officer = models.CharField(max_length=10, default='')
     # state = models.CharField(max_length=20, null=True)
     # zone = models.CharField(max_length=20, null=True)
     # address = models.CharField(max_length=100, null=True)

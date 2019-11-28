@@ -5,6 +5,12 @@ from django.db import connection
 from collections import namedtuple
 from django.views.decorators.csrf import csrf_exempt
 from django.contrib.auth.decorators import login_required
+from django.http import HttpResponseRedirect
+from instamojo_wrapper import Instamojo
+
+API_KEY = 'test_530bc68fdd48fa14a39c6eedace'
+AUTH_TOKEN = 'test_d5d9765989bcfd08e2514acafb5'
+api = Instamojo(api_key=API_KEY, auth_token=AUTH_TOKEN, endpoint='https://test.instamojo.com/api/1.1/');
 
 import datetime
 
@@ -206,6 +212,7 @@ def book_now(request, train_no, journey_date, class_type, source, destination):
         cursor.execute(f"INSERT INTO `website_ticket`(`pnr`, `transaction_id`, `journey_date`, `class_type`, `transaction_date`, `amount`, `booked_by_id`, `ticket_from_id`, `ticket_to_id`, `train_id`) VALUES ('{pnr}','{transaction_id}','{journey_date}','{class_type}','{today}','{150}','{request.user.id}','{source}','{destination}','{train_no}')")
         cursor.execute("SELECT LAST_INSERT_ID()")
         c = 0
+
         for i in range(1, 7):
             if request.POST.get("name" + str(i)) == "":
                 break
@@ -215,7 +222,20 @@ def book_now(request, train_no, journey_date, class_type, source, destination):
             gender = request.POST.get("gender" + str(i))
             seat_number = random_with_N_digits(2)
             cursor.execute(f"INSERT INTO `website_passenger`(`name`, `age`, `gender`, `seat_no`, `ticket_id`) VALUES ('{name}','{age}','{gender}','{seat_number}','{pnr}')")
-        return redirect(reverse('transaction-success', kwargs={'transaction_id':transaction_id}))
+        
+        profile_obj = Profile.objects.get(user=request.user)
+        response = api.payment_request_create(
+            amount='9',
+            purpose='Booking Ticket (SwiftRail)',
+            send_email=True,
+            send_sms=True,
+            buyer_name=request.user.first_name,
+            email=request.user.email,
+            phone=profile_obj.phone_number,
+            redirect_url=request.build_absolute_uri(reverse('transaction-success', kwargs={'transaction_id':transaction_id})),
+        )
+
+        return HttpResponseRedirect(response['payment_request']['longurl'])
     
     return render(request, app_name + 'book-now.html', context=context)
 
@@ -272,7 +292,6 @@ def last_transaction(request):
 
 @login_required
 def booked_history(request):
-    print(request.user.id)
     cursor.execute(f"SELECT * FROM website_ticket WHERE booked_by_id='{request.user.id}' ORDER BY transaction_id DESC")
     ticket_obj = namedtuplefetchall(cursor)
     all_tickets = []

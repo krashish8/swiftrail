@@ -33,6 +33,8 @@ def validateDate(date):
         return False
 
 def login(request):
+    if request.user.is_authenticated:
+        return redirect('profile')
     if request.method == "POST":
         username = request.POST['username']
         password = request.POST['password']
@@ -50,6 +52,8 @@ def logout(request):
     return redirect('login')
 
 def register(request):
+    if request.user.is_authenticated:
+        return redirect('profile')
     context = {'username': '', 'email': '', 'first_name': '', 'last_name': '', 'gender': 'M', 'date_of_birth': '', 'phone_number': '', 'address': ''}
     if request.method == "POST":
         username = request.POST.get('username')
@@ -134,6 +138,8 @@ def create_profile(request):
         date_of_birth = request.POST.get('date_of_birth')
         phone_number = request.POST.get('phone_number')
         address = request.POST.get('address')
+        if request.POST.get('email'):
+            User.objects.filter(username=request.user).update(email=request.POST.get('email'))
         context['gender'] = gender
         context['date_of_birth'] = date_of_birth
         context['phone_number'] = phone_number

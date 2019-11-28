@@ -51,7 +51,6 @@
 {% endblock %}
 
 {% block script %}
-<script>
     $("#last-transaction").on('click', function() {
         window.location = "{% url 'last-transaction' %}";
     })
@@ -61,5 +60,4 @@
     $("#cancelled-history").on('click', function() {
         window.location = "{% url 'cancelled-history' %}";
     })
-</script>
 {% endblock %}
