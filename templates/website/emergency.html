@@ -7,30 +7,31 @@
 
 <div class="container">
     <div class="row p-5"; style="font-size: 25px">
-        NEAREST POLICE STATION:
+        NEAREST STATION & CONTACT (ACCORDING TO YOUR LOCATION):
     </div>
     <table class="table">
-    <thead class="thead-dark">
-        <tr>
-        <th scope="col">Name</th>
-        <th scope="col">Phone Number</th>
-        </tr>
-    </thead>
     <tbody>
         <tr>
-        <td>Lanka Police Station</td>
-        <td>094544 04390</td>
+            <td><b>Name</b></td>
+            <td><b>{{station.station_name}} ({{station.station_code}})</b></td>
         </tr>
         <tr>
-        <td>Police Station Chetganj</td>
-        <td>0542 241 4150</td>
+            <td>Station Manager</td>
+            <td>{{station.manager}}</td>
         </tr>
-        <td>Jaitpura Police Station</td>
-        <td>0542 241 4150</td>
-        </tr><td>Kotwali Police Station</td>
-        <td>0542 241 4780</td>
-        </tr><td>Chowk Thana Varanasi</td>
-        <td>0542 451 4150</td>
+            <td>Assistant Manager</td>
+            <td>{{station.assistant_manager}}</td>
+        </tr>
+            <td>RPF</td>
+            <td>{{station.rpf}}</td>
+        </tr>
+        <tr>
+            <td>Deputy RPF</td>
+            <td>{{station.deputy_rpf}}</td>
+        </tr>
+        <tr>
+            <td>Head Officer</td>
+            <td>{{station.head_officer}}</td>
         </tr>
     </tbody>
     </table>

@@ -391,7 +391,11 @@ def cancelled_history(request):
     return render(request, app_name + 'cancelled-history.html', {'all_tickets': all_tickets})
 
 def emergency(request):
-    return render(request, app_name + 'emergency.html')
+    station_obj = Station.objects.filter(station_code='MUV')
+    context = {}
+    context['station'] = station_obj[0]
+    print(station_obj)
+    return render(request, app_name + 'emergency.html', context=context)
 
 def termsofservice(request):
     return render(request, app_name + 'terms-of-service.html')
