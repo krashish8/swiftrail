@@ -18,7 +18,7 @@
         <div style="margin-top:30px;" class="mainbox ">
             <div class="panel panel-info">
                 <div class="panel-body">
-                    <form id="train-schedule-form" class="form-horizontal" action="" method="post">
+                    <form id="live-status-form" class="form-horizontal" action="" method="post">
                         {% csrf_token %}
                         {% if messages %}
                         {% for message in messages %}
@@ -33,13 +33,23 @@
                         <div class="form-group">
                             <div class="container">
                                 <div class="row">
+                                    <div class="col-md-1 col-sm-1 col-xs-1"></div>
                                     <label class="col-md-4 col-sm-4 col-xs-4 control-label pr-5"><b>Train Number / Name:</b></label>
                                     <div class="col-md-4 col-sm-4 col-xs-4">
                                         <input type="text" class="form-control" name="train-no" placeholder="Enter Train Number / Name" required="">
                                     </div>
-                                    <!-- Button -->
+                                </div>
+                                <div class="row">
+                                    <div class="col-md-1 col-sm-1 col-xs-1"></div>
+                                    <label class="col-md-4 col-sm-4 col-xs-4 control-label pr-5"><b>Train Start Date:</b></label>
+                                    <div class="col-md-4 col-sm-4 col-xs-4">
+                                        <input type="date" class="form-control" name="date" placeholder="Enter Train Start Date" required="">
+                                    </div>
+                                </div>
+                                <!-- Button -->
+                                <div class="row mt-4 justify-content-center">
                                     <div class="col-md-4 col-sm-4 col-xs-4 controls">
-                                        <button type="submit" id="btn-train-schedule" class="btn active float-left">Get Live Status</button>
+                                        <button type="submit" id="btn-live-status" class="btn active">Submit</button>
                                     </div>
                                 </div>
                             </div>
@@ -48,6 +58,12 @@
                 </div>
             </div>
             {% if is_submit %}
+            <div class="message">
+                <div class="alert alert-danger alert-dismissible text-center" role="alert">
+                    <button type="button" class="close" data-dismiss="alert" aria-label="Close" onclick="$('.alert').remove()">&times;</button>
+                    Train is running late by {{ current_station.DelayInDeparture|get_live_delay }} when it crossed {{ current_station.StationName }} ({{ current_station.StationCode }}) at {{ current_station.ActualDeparture }}.
+                </div>
+            </div>
             <div class="panel panel-info">
                 <div style="padding-top:20px" class="panel-body">
                     <div class="container">
@@ -61,35 +77,39 @@
                                     <tbody>
                                         <tr>
                                             <td>Station Name</td>
-                                            <td>XYZ</td>
+                                            <td>{{ current_station.StationName }}</td>
                                         </tr>
                                         <tr>
                                             <td>Station Code</td>
-                                            <td>ABC</td>
+                                            <td>{{ current_station.StationCode }}</td>
                                         </tr>
                                         <tr>
                                             <td>Day</td>
-                                            <td>0</td>
+                                            <td>{{ current_station.Day }}</td>
                                         </tr>
                                         <tr>
                                             <td>Scheduled Arrival</td>
-                                            <td>00:00</td>
+                                            <td>{{ current_station.ScheduleArrival }}</td>
                                         </tr>
                                         <tr>
                                             <td>Actual Arrival</td>
-                                            <td>00:00</td>
+                                            <td>{{ current_station.ActualArrival }}</td>
+                                        </tr>
+                                        <tr>
+                                            <td>Delay In Arrival</td>
+                                            <td>{{ current_station.DelayInArrival }}</td>
                                         </tr>
                                         <tr>
                                             <td>Scheduled Departure</td>
-                                            <td>00:00</td>
+                                            <td>{{ current_station.ScheduleDeparture }}</td>
                                         </tr>
                                         <tr>
                                             <td>Actual Departure</td>
-                                            <td>00:00</td>
+                                            <td>{{ current_station.ActualDeparture }}</td>
                                         </tr>
                                         <tr>
                                             <td>Delay In Departure</td>
-                                            <td>12</td>
+                                            <td>{{ current_station.DelayInDeparture }}</td>
                                         </tr>
                                     </tbody>
                                 </table>
@@ -127,7 +147,6 @@
                                             <th>S. No.</th>
                                             <th>Station Name</th>
                                             <th>Station Code</th>
-                                            <th>Day</th>
                                             <th>Scheduled Arrival</th>
                                             <th>Actual Arrival</th>
                                             <th>Delay In Arrival</th>
@@ -137,18 +156,17 @@
                                         </tr>
                                     </thead>
                                     <tbody>
-                                        {% for schedule in schedules %}
+                                        {% for route in train_route %}
                                         <tr>
                                             <td>{{ forloop.counter }}</td>
-                                            <td>{{ schedule.station_name }}</td>
-                                            <td>{{ schedule.station_code }}</td>
-                                            <td>{{ schedule.day }}</td>
-                                            <td>{{ schedule.arrival }}</td>
-                                            <td></td>
-                                            <td></td>
-                                            <td>{{ schedule.departure }}</td>
-                                            <td></td>
-                                            <td></td>
+                                            <td>{{ route.StationName }}</td>
+                                            <td>{{ route.StationCode }}</td>
+                                            <td>{{ route.ScheduleArrival }}</td>
+                                            <td>{{ route.ActualArrival }}</td>
+                                            <td>{{ route.DelayInArrival }}</td>
+                                            <td>{{ route.ScheduleDeparture }}</td>
+                                            <td>{{ route.ActualDeparture }}</td>
+                                            <td>{{ route.DelayInDeparture }}</td>
                                         </tr>
                                         {% endfor %}
                                     </tbody>

@@ -56,29 +56,29 @@
             </div>
             <div class="row">
                 <div class="col-md-5">From: &nbsp;
-                <span><b>VARANASI JN (BSB), {{ t.journey_date }}, {{ t.schedule_source.arrival }}</b></span>
+                <span><b>{{ t.schedule_source.station_id|get_full_station_name }} ({{ t.schedule_source.station_id }}), {{ t.journey_date }}, {{ t.schedule_source.arrival }}</b></span>
                 </div>
                 <div class="col-md-1"></div>
                 <div class="col-md-5">To: &nbsp;
-                <span><b>GORAKHPUR JN (GKP), {{ t.arrival_date }}, {{ t.schedule_destination.arrival }}</b></span>
+                <span><b>{{ t.schedule_destination.station_id|get_full_station_name }} ({{ t.schedule_destination.station_id }}), {{ t.arrival_date }}, {{ t.schedule_destination.arrival }}</b></span>
                 </div>
             </div>
             <div class="row">
                 <div class="col-md-5">Boarding Station: &nbsp;
-                <span><b>VARANASI JN (BSB)</b></span>
+                <span><b>{{ t.schedule_source.station_id|get_full_station_name }} ({{ t.schedule_source.station_id }})</b></span>
                 </div>
                 <div class="col-md-1"></div>
                 <div class="col-md-5">Date Of Boarding: &nbsp;
-                <span><b>02/10/2019, 07:45 Hrs</b></span>
+                <span><b>{{ t.ticket.journey_date }}, {{ t.schedule_source.arrival }}</b></span>
                 </div>
             </div>
             <div class="row">
                 <div class="col-md-5">Class: &nbsp;
-                <span><b>SL</b></span>
+                <span><b>{{ t.ticket.class_type }}</b></span>
                 </div>
                 <div class="col-md-1"></div>
                 <div class="col-md-5">Total Fare: &nbsp;
-                <span><b>$ 250</b></span>
+                <span><b>&#8377; {{ t.ticket.amount }}</b></span>
                 </div>
             </div>
             <div class="row">
@@ -102,20 +102,15 @@
                     </tr>
                 </thead>
                 <tbody>
+                    {% for passenger in t.passengers %}
                     <tr>
-                        <th scope="">1</th>
-                        <td>A Kumar</td>
-                        <td>19</td>
-                        <td>Male</td>
-                        <td>CNF/B1/14/UB/GN</td>
+                        <th scope="row">{{ forloop.counter }}</th>
+                        <td>{{ passenger.name }}</td>
+                        <td>{{ passenger.age }} Y</td>
+                        <td>{{ passenger.gender|get_full_gender }}</td>
+                        <td>CNF/{{ ticket.class_type }}/{{ passenger.seat_no }}/{{ passenger|get_berth }}/GN    </td>
                     </tr>
-                    <tr>
-                        <th scope="row">2</th>
-                        <td>Sachin</td>
-                        <td>20</td>
-                        <td>Male</td>
-                        <td>CNF/B1/14/UB/GN</td>
-                    </tr>
+                    {% endfor %}
                 </tbody>
             </table>
         </div>

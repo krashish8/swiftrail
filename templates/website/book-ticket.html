@@ -125,7 +125,7 @@
                                                             <div>
                                                             <span style="color:black; font-size:13.5px; font-weight:bold;">2A</span>
                                                             <p style="color:green; font-size:13.5px;"><strong>{{ availability.second_ac }}</strong></p>
-                                                            <a id="book-{{ train.train_no }}-2a" class="btn active" style="padding:5px; font-size:13.5px">Book Now</a>
+                                                            <a id="book-{{ train.train_no }}-2a" class="btn active" style="padding:5px; font-size:13.5px" href="{% url 'book-now' train.train_no journey_date '2A' source destination %}">Book Now</a>
                                                             </div>
                                                         </div>
                                                     </div>
@@ -135,7 +135,7 @@
                                                             <div>
                                                             <span style="color:black; font-size:13.5px; font-weight:bold;">3A</span>
                                                             <p style="color:green; font-size:13.5px;"><strong>{{ availability.third_ac }}</strong></p>
-                                                            <a id="book-{{ train.train_no }}-3a" class="btn active" style="padding:5px; font-size:13.5px">Book Now</a>
+                                                            <a id="book-{{ train.train_no }}-3a" class="btn active" style="padding:5px; font-size:13.5px" href="{% url 'book-now' train.train_no journey_date '3A' source destination %}">Book Now</a>
                                                             </div>
                                                         </div>
                                                     </div>
@@ -145,7 +145,7 @@
                                                             <div>
                                                             <span style="color:black; font-size:13.5px; font-weight:bold;">SL</span>
                                                             <p style="color:green; font-size:13.5px;"><strong>{{ availability.sleeper }}</strong></p>
-                                                            <a id="book-{{ train.train_no }}-sl" class="btn active" style="padding:5px; font-size:13.5px">Book Now</a>
+                                                            <a id="book-{{ train.train_no }}-sl" class="btn active" style="padding:5px; font-size:13.5px" href="{% url 'book-now' train.train_no journey_date 'SL' source destination %}">Book Now</a>
                                                             </div>
                                                         </div>
                                                     </div>

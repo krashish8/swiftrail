@@ -6,12 +6,20 @@ from collections import namedtuple
 from django.views.decorators.csrf import csrf_exempt
 from django.contrib.auth.decorators import login_required
 from django.http import HttpResponseRedirect
+import requests
+import json
 from instamojo_wrapper import Instamojo
 
 API_KEY = 'test_530bc68fdd48fa14a39c6eedace'
 AUTH_TOKEN = 'test_d5d9765989bcfd08e2514acafb5'
 api = Instamojo(api_key=API_KEY, auth_token=AUTH_TOKEN, endpoint='https://test.instamojo.com/api/1.1/');
 
+
+# 650a90b2c2af21576c724aa9582480e9
+# 62ddf48ff6189aee2f1ec18cff16e48d
+
+# c5f309813b0bf98878abfb22ae5df4f4
+# fb165db20a4cbc85fe4849c16683e40e
 import datetime
 
 from random import randint
@@ -37,6 +45,23 @@ def namedtuplefetchall(cursor):
 app_name = 'website/'
 
 weekdays = ["MON", "TUE", "WED", "THU", "FRI", "SAT", "SUN"]
+
+def calc_fare(train_no, class_type, source, destination):
+    train_obj = Train.objects.get(train_no=train_no)
+    s1 = TrainSchedule.objects.get(train=train_obj, station=source)
+    s2 = TrainSchedule.objects.get(train=train_obj, station=destination)
+    dist = abs(s1.distance - s2.distance)
+    total_dist = 0
+    if class_type == "1A":
+        total_dist = dist*3
+    elif class_type == "2A":
+        total_dist = dist*1.8
+    elif class_type == "3A":
+        total_dist = dist*1.2
+    elif class_type == "SL":
+        total_dist = dist*0.6
+    return round(total_dist, 2)
+
 
 def index(request):
     return render(request, app_name + 'index.html')
@@ -198,10 +223,14 @@ def book_now(request, train_no, journey_date, class_type, source, destination):
 
     source_time = datetime.datetime.combine(datetime.date.today(), schedule_source_obj[0].arrival)
     day_diff = schedule_destination_obj[0].day - schedule_source_obj[0].day
+    print(schedule_destination_obj[0].day , schedule_source_obj[0].day)
     destination_time = datetime.datetime.combine(datetime.date.today() + datetime.timedelta(days=day_diff), schedule_destination_obj[0].arrival)
+    print(destination_time, source_time, day_diff)
     travel_time = destination_time - source_time
     context['travel_time'] = travel_time
     context['n'] = range(6)
+    context['fare'] = calc_fare(train_no, class_type, source, destination)
+    fare = context['fare']
     if request.method == "POST":
         pnr = random_with_N_digits(5)
         while Ticket.objects.filter(pnr=pnr):
@@ -209,7 +238,14 @@ def book_now(request, train_no, journey_date, class_type, source, destination):
         rows = Ticket.objects.all().count()
         transaction_id = 100000 + rows
         today = datetime.datetime.today()
-        cursor.execute(f"INSERT INTO `website_ticket`(`pnr`, `transaction_id`, `journey_date`, `class_type`, `transaction_date`, `amount`, `booked_by_id`, `ticket_from_id`, `ticket_to_id`, `train_id`) VALUES ('{pnr}','{transaction_id}','{journey_date}','{class_type}','{today}','{150}','{request.user.id}','{source}','{destination}','{train_no}')")
+
+        passengers = 0
+        for i in range(1, 7):
+            if request.POST.get("name" + str(i)) == "":
+                break
+            passengers += 1
+
+        cursor.execute(f"INSERT INTO `website_ticket`(`pnr`, `transaction_id`, `journey_date`, `class_type`, `transaction_date`, `amount`, `booked_by_id`, `ticket_from_id`, `ticket_to_id`, `train_id`) VALUES ('{pnr}','{transaction_id}','{journey_date}','{class_type}','{today}','{fare*passengers}','{request.user.id}','{source}','{destination}','{train_no}')")
         cursor.execute("SELECT LAST_INSERT_ID()")
         c = 0
 
@@ -225,7 +261,7 @@ def book_now(request, train_no, journey_date, class_type, source, destination):
         
         profile_obj = Profile.objects.get(user=request.user)
         response = api.payment_request_create(
-            amount='9',
+            amount=fare*passengers,
             purpose='Booking Ticket (SwiftRail)',
             send_email=True,
             send_sms=True,
@@ -287,7 +323,12 @@ def transactions(request):
 def last_transaction(request):
     cursor.execute(f"SELECT * FROM website_ticket WHERE booked_by_id='{request.user.id}' ORDER BY transaction_id DESC")
     ticket_obj = namedtuplefetchall(cursor)
-    context = get_transaction_detail(ticket_obj[0].transaction_id)
+    context = {}
+    if ticket_obj:
+        context['found'] = False
+        context = get_transaction_detail(ticket_obj[0].transaction_id)
+    else:
+        messages.error(request, 'No Transactions Found')
     return render(request, app_name + 'last-transaction.html', context=context)
 
 @login_required
@@ -313,6 +354,7 @@ def live_status(request):
     context = {'is_submit': False}
     if request.method == "POST":
         train_no = request.POST.get('train-no')
+        date = request.POST.get('date')
         cursor.execute(f"SELECT * FROM `website_train` WHERE `train_no`='{train_no}'")
         train_obj = namedtuplefetchall(cursor)
         if not train_obj:
@@ -320,8 +362,25 @@ def live_status(request):
         else:
             context['is_submit'] = True
             train_obj = train_obj[0]
-            cursor.execute(f"SELECT * FROM `website_trainschedule` INNER JOIN `website_station` ON (`website_trainschedule`.`station_id` =`website_station`.`station_code`) WHERE `train_id`='{train_no}' ORDER BY distance ASC")
-            schedule_obj = namedtuplefetchall(cursor)
+            # cursor.execute(f"SELECT * FROM `website_trainschedule` INNER JOIN `website_station` ON (`website_trainschedule`.`station_id` =`website_station`.`station_code`) WHERE `train_id`='{train_no}' ORDER BY distance ASC")
+            # schedule_obj = namedtuplefetchall(cursor)
             context['train'] = train_obj
-            context['schedules'] = schedule_obj
+            # context['schedules'] = schedule_obj
+
+            d = ''
+            for c in date:
+                if c != '-':
+                    d += c
+        
+            response = requests.get("http://indianrailapi.com/api/v2/livetrainstatus/apikey/bd65ce7e4f343268b4f85cc1cc95ef05/trainnumber/"+ str(train_no) +"/date/"+ str(d) +"/")
+            print(response.text)
+            j = json.loads(response.text)
+            if j.get("Message") != "SUCCESS":
+                messages.error(request, j.get("Message"))
+                context['is_submit'] = False
+            else:
+                messages.success(request, 'SUCCESS.')
+                context['current_station'] = j['CurrentStation']
+                context['train_route'] = j['TrainRoute']
+
     return render(request, app_name + 'live-status.html', context=context)

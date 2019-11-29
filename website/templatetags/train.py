@@ -84,3 +84,13 @@ def get_full_gender(obj):
         return "Female"
     else:
         return "Others/Not Specified"
+
+@register.filter
+def get_live_delay(obj):
+    if obj[-1] != "M":
+        return obj
+    obj = int(obj[:-1])
+    if (obj < 60):
+        return str(obj) + " minutes"
+    else:
+        return str(obj//60) + ":" + str(obj%60) + " hours"
