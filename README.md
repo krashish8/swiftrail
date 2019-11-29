@@ -18,4 +18,10 @@ This is the repository for the ITW-II Project at IIT (BHU) Varanasi - SwiftRail 
  - Run `python manage.py migrate` to apply migrations.
  - Start the development server using `python manage.py runserver`.
 
+## Tools and Technologies
 
+ - Django
+ - MySQL
+ - Django Social Auth
+ - Instamojo API
+ - Indian Rail API
