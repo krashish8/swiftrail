@@ -93,6 +93,7 @@ class Ticket(models.Model):
     booked_by = models.ForeignKey(User, on_delete=models.CASCADE)
     transaction_date = models.DateField()
     amount = models.DecimalField(max_digits=7, decimal_places=2)
+    is_cancelled = models.BooleanField(default=False)
 
     def __str__(self):
         return f'{self.pnr} by {self.booked_by}'

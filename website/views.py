@@ -282,7 +282,7 @@ def book_now(request, train_no, journey_date, class_type, source, destination):
                 break
             passengers += 1
 
-        cursor.execute(f"INSERT INTO `website_ticket`(`pnr`, `transaction_id`, `journey_date`, `class_type`, `transaction_date`, `amount`, `booked_by_id`, `ticket_from_id`, `ticket_to_id`, `train_id`) VALUES ('{pnr}','{transaction_id}','{journey_date}','{class_type}','{today}','{fare*passengers}','{request.user.id}','{source}','{destination}','{train_no}')")
+        cursor.execute(f"INSERT INTO `website_ticket`(`pnr`, `transaction_id`, `journey_date`, `class_type`, `transaction_date`, `amount`, `booked_by_id`, `ticket_from_id`, `ticket_to_id`, `train_id`, `is_cancelled`) VALUES ('{pnr}','{transaction_id}','{journey_date}','{class_type}','{today}','{fare*passengers}','{request.user.id}','{source}','{destination}','{train_no}', '0')")
         cursor.execute("SELECT LAST_INSERT_ID()")
         c = 0
 
@@ -371,16 +371,24 @@ def last_transaction(request):
 
 @login_required
 def booked_history(request):
-    cursor.execute(f"SELECT * FROM website_ticket WHERE booked_by_id='{request.user.id}' ORDER BY transaction_id DESC")
+    cursor.execute(f"SELECT * FROM website_ticket WHERE (booked_by_id='{request.user.id}' AND is_cancelled='0') ORDER BY transaction_id DESC")
     ticket_obj = namedtuplefetchall(cursor)
+    print(ticket_obj)
     all_tickets = []
     for ticket in ticket_obj:
         all_tickets.append(get_transaction_detail(ticket.transaction_id))
-    return render_to_response(app_name + 'booked-history.html', {'all_tickets': all_tickets})
+    return render(request, app_name + 'booked-history.html', {'all_tickets': all_tickets})
+
 
 @login_required
 def cancelled_history(request):
-    return render(request, app_name + 'cancelled-history.html')
+    cursor.execute(f"SELECT * FROM website_ticket WHERE (booked_by_id='{request.user.id}' AND is_cancelled='1') ORDER BY transaction_id DESC")
+    ticket_obj = namedtuplefetchall(cursor)
+    print(ticket_obj)
+    all_tickets = []
+    for ticket in ticket_obj:
+        all_tickets.append(get_transaction_detail(ticket.transaction_id))
+    return render(request, app_name + 'cancelled-history.html', {'all_tickets': all_tickets})
 
 def emergency(request):
     return render(request, app_name + 'emergency.html')
@@ -422,3 +430,11 @@ def live_status(request):
                 context['train_route'] = j['TrainRoute']
 
     return render(request, app_name + 'live-status.html', context=context)
+
+
+@login_required
+def ticket_cancel_page(request, pnr_no):
+    Ticket.objects.filter(pnr=pnr_no).update(is_cancelled=1)
+    context = {}
+    messages.success(request, 'Your ticket has been successfully cancelled.')
+    return render(request, app_name + 'ticket-cancel-page.html', context=context)

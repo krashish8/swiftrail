@@ -114,27 +114,25 @@
                 </tbody>
             </table>
         </div>
-        <!-- <table class="table table-borderless">
+        <table class="table table-borderless">
             <tbody>
                 <tr>
-                    <td align="right" style="width:50%;"><button type="button" class="btn btn-primary btn-sm" data-target="#cancelTicket_modal" data-toggle="modal">Cancel Ticket</button></td>
-                    <td align="left"><button type="button" class="btn btn-primary btn-sm">Print E-Ticket</button></td>
+                    <td align="right" style="width:50%;"><button type="button" class="btn btn-primary btn-sm" data-target="#cancelTicket_modal-{{t.ticket.pnr}}" data-toggle="modal">Cancel Ticket</button></td>
+                    <!-- <td align="left"><button type="button" class="btn btn-primary btn-sm">Print E-Ticket</button></td> -->
                 </tr>
             </tbody>
-        </table> -->
+        </table>
     </div>
 </div>
-{% endfor %}
 
-<!-- Modal -->
-<div class="modal fade" id="cancelTicket_modal" tabindex="-1" role="dialog" aria-labelledby="cancelTicketTitle" aria-hidden="true">
+<div class="modal fade" id="cancelTicket_modal-{{t.ticket.pnr}}" tabindex="-1" role="dialog" aria-labelledby="cancelTicketTitle" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered modal-lg"role="document">
         <div class="modal-content">
             <div class="modal-header">
                 <h6>Cancel Ticket<span class="extra-title muted"></span></h6>
             </div>
             <div class="modal-body form-horizontal" style="padding:0">
-                <div class="container" style="padding-left:5%; padding-right:5%">
+                <!-- <div class="container" style="padding-left:5%; padding-right:5%">
                     <table class="table table-sm">
                         <thead>
                             <tr>
@@ -162,12 +160,21 @@
                             </tr>
                         </tbody>
                     </table>    
+                </div> -->
+                <div class="container" style="padding-left:5%; padding-right:5%">
+                    <div class="row">
+                        <br>
+                        Are you sure to cancel this ticket?
+                        <br>
+                        <br>
+                    </div>
                 </div>
             </div>
             <div class="modal-footer">
-                <button href="#" class="btn btn-primary" id="password_modal_save">Cancel Ticket</button>
+                <a href="{% url 'ticket-cancel-page' t.ticket.pnr %}" class="btn btn-primary">Cancel Ticket</a>
             </div>
         </div>
     </div>
 </div>
+{% endfor %}
 {% endblock %}

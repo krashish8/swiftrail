@@ -18,4 +18,5 @@ urlpatterns = [
     path('transactions/cancelled/', views.cancelled_history, name='cancelled-history'),
     path('emergency/', views.emergency, name='emergency'),
     path('terms-of-service/', views.termsofservice, name='terms-of-service'),
+    path('ticket-cancel-page/<pnr_no>/', views.ticket_cancel_page, name='ticket-cancel-page'),
 ]
