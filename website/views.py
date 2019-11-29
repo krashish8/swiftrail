@@ -20,6 +20,7 @@ api = Instamojo(api_key=API_KEY, auth_token=AUTH_TOKEN, endpoint='https://test.i
 
 # c5f309813b0bf98878abfb22ae5df4f4
 # fb165db20a4cbc85fe4849c16683e40e
+
 import datetime
 
 from random import randint
@@ -29,7 +30,6 @@ def random_with_N_digits(n):
     range_end = (10**n)-1
     return randint(range_start, range_end)
 
-cursor = connection.cursor()
 
 def dictfetchall(cursor):
     "Return all rows from a cursor as a dict"
@@ -71,8 +71,9 @@ def pnr_status(request):
     context = {'is_submit': False}
     if request.method == "POST":
         pnr = request.POST.get('pnr')
-        cursor.execute(f"SELECT * FROM `website_ticket` INNER JOIN `website_train` ON (`website_ticket`.`train_id` = `website_train`.`train_no`) WHERE `pnr` = '{pnr}'")
-        ticket_obj = namedtuplefetchall(cursor)
+        with connection.cursor() as cursor:
+            cursor.execute(f"SELECT * FROM `website_ticket` INNER JOIN `website_train` ON (`website_ticket`.`train_id` = `website_train`.`train_no`) WHERE `pnr` = '{pnr}'")
+            ticket_obj = namedtuplefetchall(cursor)
         if not ticket_obj:
             messages.error(request, 'The given PNR Number does not exist.')
         else:
@@ -82,8 +83,9 @@ def pnr_status(request):
             
             context['ticket'] = ticket_obj
             
-            cursor.execute(f"SELECT * FROM `website_passenger` WHERE `ticket_id` = '{ticket_obj.pnr}'")
-            passenger_obj = namedtuplefetchall(cursor)
+            with connection.cursor() as cursor:
+                cursor.execute(f"SELECT * FROM `website_passenger` WHERE `ticket_id` = '{ticket_obj.pnr}'")
+                passenger_obj = namedtuplefetchall(cursor)
             context['passengers'] = passenger_obj
     return render(request, app_name + 'pnr-status.html', context=context)
 
@@ -96,15 +98,17 @@ def train_schedule(request):
     context = {'is_submit': False}
     if request.method == "POST":
         train_no = request.POST.get('train-no')
-        cursor.execute(f"SELECT * FROM `website_train` WHERE `train_no`='{train_no}'")
-        train_obj = namedtuplefetchall(cursor)
+        with connection.cursor() as cursor:
+            cursor.execute(f"SELECT * FROM `website_train` WHERE `train_no`='{train_no}'")
+            train_obj = namedtuplefetchall(cursor)
         if not train_obj:
             messages.error(request, 'The given Train Number does not exist.')
         else:
             context['is_submit'] = True
             train_obj = train_obj[0]
-            cursor.execute(f"SELECT * FROM `website_trainschedule` INNER JOIN `website_station` ON (`website_trainschedule`.`station_id` =`website_station`.`station_code`) WHERE `train_id`='{train_no}' ORDER BY distance ASC")
-            schedule_obj = namedtuplefetchall(cursor)
+            with connection.cursor() as cursor:
+                cursor.execute(f"SELECT * FROM `website_trainschedule` INNER JOIN `website_station` ON (`website_trainschedule`.`station_id` =`website_station`.`station_code`) WHERE `train_id`='{train_no}' ORDER BY distance ASC")
+                schedule_obj = namedtuplefetchall(cursor)
             context['train'] = train_obj
             context['schedules'] = schedule_obj
     return render(request, app_name + 'train-schedule.html', context=context)
@@ -116,30 +120,32 @@ def train_search(request):
         source = request.POST.get("source")
         destination = request.POST.get("destination")
 
-        cursor.execute(f"SELECT T1.train_id, T1.day FROM website_trainschedule as T1, website_trainschedule as T2 WHERE T1.station_id='{source}' AND T2.station_id='{destination}' AND T1.distance < T2.distance AND T1.train_id=T2.train_id")
-        search = namedtuplefetchall(cursor)
+        with connection.cursor() as cursor:
+            cursor.execute(f"SELECT T1.train_id, T1.day FROM website_trainschedule as T1, website_trainschedule as T2 WHERE T1.station_id='{source}' AND T2.station_id='{destination}' AND T1.distance < T2.distance AND T1.train_id=T2.train_id")
+            search = namedtuplefetchall(cursor)
 
-        search_without_date = []
-        for s in search:
-            try:
-                search_without_date += cursor.fetchone()
-            except:
-                pass
+            search_without_date = []
+            for s in search:
+                try:
+                    search_without_date += cursor.fetchone()
+                except:
+                    pass
         
         trains_obj = []
         traintime = []
 
-        for train_no in search:
-            print(train_no)
-            train_no = train_no.train_id
-            cursor.execute(f"SELECT * FROM `website_train` WHERE `train_no`='{train_no}'")
-            trains_obj += namedtuplefetchall(cursor)
-            l = {}
-            cursor.execute(f"SELECT `arrival`, `day` FROM `website_trainschedule` WHERE `train_id`='{train_no}' AND `station_id`='{source}'")
-            l['source'] = cursor.fetchone()
-            cursor.execute(f"SELECT `arrival`, `day` FROM `website_trainschedule` WHERE `train_id`='{train_no}' AND `station_id`='{destination}'")
-            l['destination'] = cursor.fetchone()
-            traintime.append(l)
+        with connection.cursor() as cursor:
+            for train_no in search:
+                print(train_no)
+                train_no = train_no.train_id
+                cursor.execute(f"SELECT * FROM `website_train` WHERE `train_no`='{train_no}'")
+                trains_obj += namedtuplefetchall(cursor)
+                l = {}
+                cursor.execute(f"SELECT `arrival`, `day` FROM `website_trainschedule` WHERE `train_id`='{train_no}' AND `station_id`='{source}'")
+                l['source'] = cursor.fetchone()
+                cursor.execute(f"SELECT `arrival`, `day` FROM `website_trainschedule` WHERE `train_id`='{train_no}' AND `station_id`='{destination}'")
+                l['destination'] = cursor.fetchone()
+                traintime.append(l)
 
         if not trains_obj:
             messages.error(request, 'No Trains Found.')
@@ -167,25 +173,26 @@ def book_ticket(request):
 
         day_number_source = datetime.datetime.strptime(journey_date, "%Y-%m-%d").weekday()  #Day Number for searched date
 
-        cursor.execute(f"SELECT T1.train_id, T1.day FROM website_trainschedule as T1, website_trainschedule as T2 WHERE T1.station_id='{source}' AND T2.station_id='{destination}' AND T1.distance < T2.distance AND T1.train_id=T2.train_id")
-        search_flexible = namedtuplefetchall(cursor)
+        with connection.cursor() as cursor:
+            cursor.execute(f"SELECT T1.train_id, T1.day FROM website_trainschedule as T1, website_trainschedule as T2 WHERE T1.station_id='{source}' AND T2.station_id='{destination}' AND T1.distance < T2.distance AND T1.train_id=T2.train_id")
+            search_flexible = namedtuplefetchall(cursor)
 
-        # Splitting search_flexible in two parts, each storing train number
-        search_with_date = []
-        search_without_date = []
-        for s in search_flexible:
-            day_number_train = (day_number_source - s.day + 7) % 7
-            day_train = weekdays[day_number_train]
-            cursor.execute(f"SELECT train_no FROM website_train WHERE train_no='{s.train_id}' AND run_days LIKE '%{day_train}%'")
-            try:
-                search_with_date += cursor.fetchone()
-            except:
-                pass
-            cursor.execute(f"SELECT train_no FROM website_train WHERE train_no='{s.train_id}' AND run_days NOT LIKE '%{day_train}%'")
-            try:
-                search_without_date += cursor.fetchone()
-            except:
-                pass
+            # Splitting search_flexible in two parts, each storing train number
+            search_with_date = []
+            search_without_date = []
+            for s in search_flexible:
+                day_number_train = (day_number_source - s.day + 7) % 7
+                day_train = weekdays[day_number_train]
+                cursor.execute(f"SELECT train_no FROM website_train WHERE train_no='{s.train_id}' AND run_days LIKE '%{day_train}%'")
+                try:
+                    search_with_date += cursor.fetchone()
+                except:
+                    pass
+                cursor.execute(f"SELECT train_no FROM website_train WHERE train_no='{s.train_id}' AND run_days NOT LIKE '%{day_train}%'")
+                try:
+                    search_without_date += cursor.fetchone()
+                except:
+                    pass
         
         # Complete detail of train
         trains_obj_with_date = []
@@ -196,34 +203,36 @@ def book_ticket(request):
         seat_availability_with_date = []
         seat_availability_without_date = []
 
-        for train_no in search_with_date:
-            cursor.execute(f"SELECT * FROM `website_train` WHERE `train_no`='{train_no}'")
-            trains_obj_with_date += namedtuplefetchall(cursor)
-            l = {}
-            cursor.execute(f"SELECT `arrival`, `day` FROM `website_trainschedule` WHERE `train_id`='{train_no}' AND `station_id`='{source}'")
-            l['source'] = cursor.fetchone()
-            cursor.execute(f"SELECT `arrival`, `day` FROM `website_trainschedule` WHERE `train_id`='{train_no}' AND `station_id`='{destination}'")
-            l['destination'] = cursor.fetchone()
-            traintime_with_date.append(l)
+        with connection.cursor() as cursor:
+            for train_no in search_with_date:
+                cursor.execute(f"SELECT * FROM `website_train` WHERE `train_no`='{train_no}'")
+                trains_obj_with_date += namedtuplefetchall(cursor)
+                l = {}
+                cursor.execute(f"SELECT `arrival`, `day` FROM `website_trainschedule` WHERE `train_id`='{train_no}' AND `station_id`='{source}'")
+                l['source'] = cursor.fetchone()
+                cursor.execute(f"SELECT `arrival`, `day` FROM `website_trainschedule` WHERE `train_id`='{train_no}' AND `station_id`='{destination}'")
+                l['destination'] = cursor.fetchone()
+                traintime_with_date.append(l)
 
-            cursor.execute(f"SELECT * FROM `website_trainseatchart` WHERE `train_id`='{train_no}' AND `journey_date`='{journey_date}'")
-            seat_chart = namedtuplefetchall(cursor)
-            seat_availability_with_date += seat_chart
+                cursor.execute(f"SELECT * FROM `website_trainseatchart` WHERE `train_id`='{train_no}' AND `journey_date`='{journey_date}'")
+                seat_chart = namedtuplefetchall(cursor)
+                seat_availability_with_date += seat_chart
 
 
-        for train_no in search_without_date:
-            cursor.execute(f"SELECT * FROM `website_train` WHERE `train_no`='{train_no}'")
-            trains_obj_without_date += namedtuplefetchall(cursor)
-            l = {}
-            cursor.execute(f"SELECT `arrival`, `day` FROM `website_trainschedule` WHERE `train_id`='{train_no}' AND `station_id`='{source}'")
-            l['source'] = cursor.fetchone()
-            cursor.execute(f"SELECT `arrival`, `day` FROM `website_trainschedule` WHERE `train_id`='{train_no}' AND `station_id`='{destination}'")
-            l['destination'] = cursor.fetchone()
-            traintime_without_date.append(l)
+            for train_no in search_without_date:
+                cursor.execute(f"SELECT * FROM `website_train` WHERE `train_no`='{train_no}'")
+                trains_obj_without_date += namedtuplefetchall(cursor)
+                l = {}
+                cursor.execute(f"SELECT `arrival`, `day` FROM `website_trainschedule` WHERE `train_id`='{train_no}' AND `station_id`='{source}'")
+                l['source'] = cursor.fetchone()
+                cursor.execute(f"SELECT `arrival`, `day` FROM `website_trainschedule` WHERE `train_id`='{train_no}' AND `station_id`='{destination}'")
+                l['destination'] = cursor.fetchone()
+                traintime_without_date.append(l)
 
-            cursor.execute(f"SELECT * FROM website_trainseatchart WHERE `train_id`='{train_no}' AND `journey_date`='{journey_date}'")
-            seat_chart = namedtuplefetchall(cursor)
-            seat_availability_without_date += seat_chart
+                cursor.execute(f"SELECT * FROM website_trainseatchart WHERE `train_id`='{train_no}' AND `journey_date`='{journey_date}'")
+                seat_chart = namedtuplefetchall(cursor)
+                seat_availability_without_date += seat_chart
+        
         if not trains_obj_with_date and not trains_obj_without_date:
             messages.error(request, 'No Trains Found.')
         else:
@@ -248,12 +257,13 @@ def book_now(request, train_no, journey_date, class_type, source, destination):
         'source': source,
         'destination': destination,
     }
-    cursor.execute(f"SELECT * FROM website_train WHERE train_no='{train_no}'")
-    train_obj = namedtuplefetchall(cursor)
-    cursor.execute(f"SELECT * FROM website_trainschedule WHERE train_id='{train_no}' AND station_id='{source}'")
-    schedule_source_obj = namedtuplefetchall(cursor)
-    cursor.execute(f"SELECT * FROM website_trainschedule WHERE train_id='{train_no}' AND station_id='{destination}'")
-    schedule_destination_obj = namedtuplefetchall(cursor)
+    with connection.cursor() as cursor:
+        cursor.execute(f"SELECT * FROM website_train WHERE train_no='{train_no}'")
+        train_obj = namedtuplefetchall(cursor)
+        cursor.execute(f"SELECT * FROM website_trainschedule WHERE train_id='{train_no}' AND station_id='{source}'")
+        schedule_source_obj = namedtuplefetchall(cursor)
+        cursor.execute(f"SELECT * FROM website_trainschedule WHERE train_id='{train_no}' AND station_id='{destination}'")
+        schedule_destination_obj = namedtuplefetchall(cursor)
     context['train'] = train_obj[0]
     context['schedule_source'] = schedule_source_obj[0]
     context['schedule_destination'] = schedule_destination_obj[0]
@@ -281,20 +291,20 @@ def book_now(request, train_no, journey_date, class_type, source, destination):
             if request.POST.get("name" + str(i)) == "":
                 break
             passengers += 1
+        with connection.cursor() as cursor:
+            cursor.execute(f"INSERT INTO `website_ticket`(`pnr`, `transaction_id`, `journey_date`, `class_type`, `transaction_date`, `amount`, `booked_by_id`, `ticket_from_id`, `ticket_to_id`, `train_id`, `is_cancelled`) VALUES ('{pnr}','{transaction_id}','{journey_date}','{class_type}','{today}','{fare*passengers}','{request.user.id}','{source}','{destination}','{train_no}', '0')")
+            cursor.execute("SELECT LAST_INSERT_ID()")
+            c = 0
 
-        cursor.execute(f"INSERT INTO `website_ticket`(`pnr`, `transaction_id`, `journey_date`, `class_type`, `transaction_date`, `amount`, `booked_by_id`, `ticket_from_id`, `ticket_to_id`, `train_id`, `is_cancelled`) VALUES ('{pnr}','{transaction_id}','{journey_date}','{class_type}','{today}','{fare*passengers}','{request.user.id}','{source}','{destination}','{train_no}', '0')")
-        cursor.execute("SELECT LAST_INSERT_ID()")
-        c = 0
-
-        for i in range(1, 7):
-            if request.POST.get("name" + str(i)) == "":
-                break
-            c = c + 1
-            name = request.POST.get("name" + str(i))
-            age = request.POST.get("age" + str(i))
-            gender = request.POST.get("gender" + str(i))
-            seat_number = random_with_N_digits(2)
-            cursor.execute(f"INSERT INTO `website_passenger`(`name`, `age`, `gender`, `seat_no`, `ticket_id`) VALUES ('{name}','{age}','{gender}','{seat_number}','{pnr}')")
+            for i in range(1, 7):
+                if request.POST.get("name" + str(i)) == "":
+                    break
+                c = c + 1
+                name = request.POST.get("name" + str(i))
+                age = request.POST.get("age" + str(i))
+                gender = request.POST.get("gender" + str(i))
+                seat_number = random_with_N_digits(2)
+                cursor.execute(f"INSERT INTO `website_passenger`(`name`, `age`, `gender`, `seat_no`, `ticket_id`) VALUES ('{name}','{age}','{gender}','{seat_number}','{pnr}')")
         
         profile_obj = Profile.objects.get(user=request.user)
         response = api.payment_request_create(
@@ -314,17 +324,18 @@ def book_now(request, train_no, journey_date, class_type, source, destination):
 
 # Custom function
 def get_transaction_detail(transaction_id):
-    cursor.execute(f"SELECT * FROM website_ticket WHERE transaction_id='{transaction_id}'")
-    ticket_obj = namedtuplefetchall(cursor)
-    train_no = ticket_obj[0].train_id
-    source = ticket_obj[0].ticket_from_id
-    destination = ticket_obj[0].ticket_to_id
-    cursor.execute(f"SELECT * FROM website_train WHERE train_no='{train_no}'")
-    train_obj = namedtuplefetchall(cursor)
-    cursor.execute(f"SELECT * FROM website_trainschedule WHERE train_id='{train_no}' AND station_id='{source}'")
-    schedule_source_obj = namedtuplefetchall(cursor)
-    cursor.execute(f"SELECT * FROM website_trainschedule WHERE train_id='{train_no}' AND station_id='{destination}'")
-    schedule_destination_obj = namedtuplefetchall(cursor)
+    with connection.cursor() as cursor:
+        cursor.execute(f"SELECT * FROM website_ticket WHERE transaction_id='{transaction_id}'")
+        ticket_obj = namedtuplefetchall(cursor)
+        train_no = ticket_obj[0].train_id
+        source = ticket_obj[0].ticket_from_id
+        destination = ticket_obj[0].ticket_to_id
+        cursor.execute(f"SELECT * FROM website_train WHERE train_no='{train_no}'")
+        train_obj = namedtuplefetchall(cursor)
+        cursor.execute(f"SELECT * FROM website_trainschedule WHERE train_id='{train_no}' AND station_id='{source}'")
+        schedule_source_obj = namedtuplefetchall(cursor)
+        cursor.execute(f"SELECT * FROM website_trainschedule WHERE train_id='{train_no}' AND station_id='{destination}'")
+        schedule_destination_obj = namedtuplefetchall(cursor)
     context = {}
     context['ticket'] = ticket_obj[0]
     context['train'] = train_obj[0]
@@ -340,8 +351,9 @@ def get_transaction_detail(transaction_id):
     travel_time = destination_time - source_time
     context['travel_time'] = travel_time
 
-    cursor.execute(f"SELECT * FROM website_passenger WHERE ticket_id='{ticket_obj[0].pnr}'")
-    passenger_obj = namedtuplefetchall(cursor)
+    with connection.cursor() as cursor:
+        cursor.execute(f"SELECT * FROM website_passenger WHERE ticket_id='{ticket_obj[0].pnr}'")
+        passenger_obj = namedtuplefetchall(cursor)
     context['passengers'] = passenger_obj
 
     return context
@@ -358,8 +370,9 @@ def transactions(request):
 
 @login_required
 def last_transaction(request):
-    cursor.execute(f"SELECT * FROM website_ticket WHERE booked_by_id='{request.user.id}' ORDER BY transaction_id DESC")
-    ticket_obj = namedtuplefetchall(cursor)
+    with connection.cursor() as cursor:
+        cursor.execute(f"SELECT * FROM website_ticket WHERE booked_by_id='{request.user.id}' ORDER BY transaction_id DESC")
+        ticket_obj = namedtuplefetchall(cursor)
     context = {}
     if ticket_obj:
         context = get_transaction_detail(ticket_obj[0].transaction_id)
@@ -371,8 +384,9 @@ def last_transaction(request):
 
 @login_required
 def booked_history(request):
-    cursor.execute(f"SELECT * FROM website_ticket WHERE (booked_by_id='{request.user.id}' AND is_cancelled='0') ORDER BY transaction_id DESC")
-    ticket_obj = namedtuplefetchall(cursor)
+    with connection.cursor() as cursor:
+        cursor.execute(f"SELECT * FROM website_ticket WHERE (booked_by_id='{request.user.id}' AND is_cancelled='0') ORDER BY transaction_id DESC")
+        ticket_obj = namedtuplefetchall(cursor)
     print(ticket_obj)
     all_tickets = []
     for ticket in ticket_obj:
@@ -382,8 +396,9 @@ def booked_history(request):
 
 @login_required
 def cancelled_history(request):
-    cursor.execute(f"SELECT * FROM website_ticket WHERE (booked_by_id='{request.user.id}' AND is_cancelled='1') ORDER BY transaction_id DESC")
-    ticket_obj = namedtuplefetchall(cursor)
+    with connection.cursor() as cursor:
+        cursor.execute(f"SELECT * FROM website_ticket WHERE (booked_by_id='{request.user.id}' AND is_cancelled='1') ORDER BY transaction_id DESC")
+        ticket_obj = namedtuplefetchall(cursor)
     print(ticket_obj)
     all_tickets = []
     for ticket in ticket_obj:
@@ -405,8 +420,9 @@ def live_status(request):
     if request.method == "POST":
         train_no = request.POST.get('train-no')
         date = request.POST.get('date')
-        cursor.execute(f"SELECT * FROM `website_train` WHERE `train_no`='{train_no}'")
-        train_obj = namedtuplefetchall(cursor)
+        with connection.cursor() as cursor:
+            cursor.execute(f"SELECT * FROM `website_train` WHERE `train_no`='{train_no}'")
+            train_obj = namedtuplefetchall(cursor)
         if not train_obj:
             messages.error(request, 'The given Train Number does not exist.')
         else:
