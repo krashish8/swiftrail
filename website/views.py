@@ -325,10 +325,11 @@ def last_transaction(request):
     ticket_obj = namedtuplefetchall(cursor)
     context = {}
     if ticket_obj:
-        context['found'] = False
         context = get_transaction_detail(ticket_obj[0].transaction_id)
+        context['found'] = True
     else:
         messages.error(request, 'No Transactions Found')
+        context['found'] = False
     return render(request, app_name + 'last-transaction.html', context=context)
 
 @login_required
