@@ -93,7 +93,7 @@ DATABASES = {
     }
 }
 
-DATABASES['default'].update(dj_database_url.config(conn_max_age=6000, ssl_require=True))
+DATABASES['default'].update(dj_database_url.config(conn_max_age=360, ssl_require=True))
 
 try:
     del DATABASES['default']['OPTIONS']['sslmode']
