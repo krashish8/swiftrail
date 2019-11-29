@@ -16,6 +16,7 @@ This is the repository for the ITW-II Project at IIT (BHU) Varanasi - SwiftRail 
  - <b>Copy</b> `my.cnf.example` as `my.cnf` and enter the `username` of the MySQL User in `<username>` and `password` in `<password>`.
  - Run `python manage.py makemigrations` for creating new migrations
  - Run `python manage.py migrate` to apply migrations.
+ - Run `python script.py` to update data in the database.
  - Start the development server using `python manage.py runserver`.
 
 ## Tools and Technologies
