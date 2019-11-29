@@ -111,7 +111,44 @@ def train_schedule(request):
 
 
 def train_search(request):
-    return render(request, app_name + 'train-search.html')
+    context = {"is_submit": False}
+    if request.method == "POST":
+        source = request.POST.get("source")
+        destination = request.POST.get("destination")
+
+        cursor.execute(f"SELECT T1.train_id, T1.day FROM website_trainschedule as T1, website_trainschedule as T2 WHERE T1.station_id='{source}' AND T2.station_id='{destination}' AND T1.distance < T2.distance AND T1.train_id=T2.train_id")
+        search = namedtuplefetchall(cursor)
+
+        search_without_date = []
+        for s in search:
+            try:
+                search_without_date += cursor.fetchone()
+            except:
+                pass
+        
+        trains_obj = []
+        traintime = []
+
+        for train_no in search:
+            print(train_no)
+            train_no = train_no.train_id
+            cursor.execute(f"SELECT * FROM `website_train` WHERE `train_no`='{train_no}'")
+            trains_obj += namedtuplefetchall(cursor)
+            l = {}
+            cursor.execute(f"SELECT `arrival`, `day` FROM `website_trainschedule` WHERE `train_id`='{train_no}' AND `station_id`='{source}'")
+            l['source'] = cursor.fetchone()
+            cursor.execute(f"SELECT `arrival`, `day` FROM `website_trainschedule` WHERE `train_id`='{train_no}' AND `station_id`='{destination}'")
+            l['destination'] = cursor.fetchone()
+            traintime.append(l)
+
+        if not trains_obj:
+            messages.error(request, 'No Trains Found.')
+        else:
+            context['t1'] = zip(trains_obj, traintime)
+            context['source'] = source
+            context['destination'] = destination
+            context['is_submit'] = True
+    return render(request, app_name + 'train-search.html', context=context)
 
 
 @login_required

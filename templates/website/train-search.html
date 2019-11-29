@@ -1,4 +1,5 @@
 {% extends '../base.html' %}
+{% load train %}
 
 {% block title %} Train Between Stations {% endblock %}
 
@@ -23,19 +24,18 @@
                 <div class="panel-body">
                     <form id="train-search-form" class="form-horizontal" action="" method="post">
                         {% csrf_token %}
-                        <div id="train-search-alert" style="display:none" class="alert alert-danger">
-                            <p>Error:</p>
-                            <span></span>
-                        </div>
                         <div class="form-group">
                             <div class="container">
-                                <div class="row">
-                                    <div class="col-md-1 col-sm-1 col-xs-1"></div>
-                                    <label class="col-md-4 col-sm-4 col-xs-4 control-label pr-5"><b>Journey Date:</b></label>
-                                    <div class="col-md-4 col-sm-4 col-xs-4">
-                                        <input type="date" class="form-control" name="date" placeholder="Enter Journey Date" required="">
+                                {% if messages %}
+                                {% for message in messages %}
+                                <div class="message">
+                                    <div class="alert alert-{{message.tags}} alert-dismissible text-center" role="alert">
+                                        <button type="button" class="close" data-dismiss="alert" aria-label="Close" onclick="$('.alert').remove()">&times;</button>
+                                        {{message}}
                                     </div>
                                 </div>
+                                {% endfor %}
+                                {% endif %}
                                 <div class="row mt-2">
                                     <div class="col-md-1 col-sm-1 col-xs-1"></div>
                                     <label class="col-md-4 col-sm-4 col-xs-4 control-label pr-5"><b>Source Station:</b></label>
@@ -61,6 +61,7 @@
                     </form>
                 </div>
             </div>
+            {% if is_submit %}
             <div class="panel panel-info">
                 <div style="padding-top:20px" class="panel-body">
                     <div class="container">
@@ -69,80 +70,33 @@
                                 <table class="table table-bordered">
                                     <thead class="thead-blue">
                                         <tr>
-                                            <th rowspan="2">S. No.</th>
-                                            <th rowspan="2">Train Number</th>
-                                            <th rowspan="2">Train Name</th>
-                                            <th rowspan="2">Origin</th>
-                                            <th rowspan="2">Departure Time</th>
-                                            <th rowspan="2">Destination</th>
-                                            <th rowspan="2">Arrival Time</th>
-                                            <th rowspan="2">Travel Time</th>
-                                            <th colspan="7">Days of Run</th>
-                                            <th rowspan="2">Classes</th>
+                                            <th>S. No.</th>
+                                            <th>Train Number</th>
+                                            <th>Train Name</th>
+                                            <th>Origin</th>
+                                            <th>Departure Time</th>
+                                            <th>Destination</th>
+                                            <th>Arrival Time</th>
+                                            <th>Travel Time</th>
+                                            <th>Days of Run</th>
+                                            <th>Classes</th>
                                         </tr>
                                     </thead>
                                     <tbody>
+                                        {% for train, time in t1 %}
                                         <tr>
-                                            <td>1</td>
-                                            <td>TRAIN NO</td>
-                                            <td>TRAIN NAME</td>
-                                            <td>SOURCE</td>
-                                            <td>TIME</td>
-                                            <td>DESTINATION</td>
-                                            <td>TIME</td>
-                                            <td>TIME</td>
-                                            <td>N</td>
-                                            <td>N</td>
-                                            <td>N</td>
-                                            <td>N</td>
-                                            <td>N</td>
-                                            <td>N</td>
-                                            <td>N</td>
+                                            <td>{{forloop.counter}}</td>
+                                            <td>{{train.train_no}}</td>
+                                            <td>{{train.train_name}}</td>
+                                            <td>{{source}}</td>
+                                            <td>{{time.source.0}}</td>
+                                            <td>{{destination}}</td>
+                                            <td>{{time.destination.0}}</td>
+                                            <td>{{ time|get_travel_time }}</td>
+                                            <td>{{train.run_days}}</td>
                                             <td>2A 3A SL</td>
                                         </tr>
-                                    </tbody>
-                                </table>
-                            </div>
-                        </div>
-                        <div class="row mt-4 ml-1" style="text-align: center; font-size: 1.1rem">
-                            <b>TRAIN RUNNING ON OTHER DAYS:</b>
-                        </div>
-                        <div class="row mt-2">
-                            <div class="col-md-12">
-                                <table class="table table-bordered">
-                                    <thead class="thead-blue">
-                                        <tr>
-                                            <th rowspan="2">S. No.</th>
-                                            <th rowspan="2">Train Number</th>
-                                            <th rowspan="2">Train Name</th>
-                                            <th rowspan="2">Origin</th>
-                                            <th rowspan="2">Departure Time</th>
-                                            <th rowspan="2">Destination</th>
-                                            <th rowspan="2">Arrival Time</th>
-                                            <th rowspan="2">Travel Time</th>
-                                            <th colspan="7">Days of Run</th>
-                                            <th rowspan="2">Classes</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        <tr>
-                                            <td>1</td>
-                                            <td>TRAIN NO</td>
-                                            <td>TRAIN NAME</td>
-                                            <td>SOURCE</td>
-                                            <td>TIME</td>
-                                            <td>DESTINATION</td>
-                                            <td>TIME</td>
-                                            <td>TIME</td>
-                                            <td>N</td>
-                                            <td>N</td>
-                                            <td>N</td>
-                                            <td>N</td>
-                                            <td>N</td>
-                                            <td>N</td>
-                                            <td>N</td>
-                                            <td>2A 3A SL</td>
-                                        </tr>
+                                        {% endfor %}
                                     </tbody>
                                 </table>
                             </div>
@@ -150,8 +104,23 @@
                     </div>
                 </div>
             </div>
+            {% endif %}
         </div>
     </div>
 </div>
 <!--//train between stations form ends here-->
+{% endblock %}
+
+{% block script %}
+
+{% if messages %}
+{% for message in messages %}
+    window.setTimeout(function () {
+        $(".alert-{{message.tags}}").fadeTo(1000, 0).slideUp(500, function () {
+            $(this).remove();
+        });
+    }, 2000);
+{% endfor %}
+{% endif %}
+
 {% endblock %}
