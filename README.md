@@ -1,6 +1,6 @@
 # SwiftRail
 
-This is the repository for the ITW-II Project - Railway Management System.
+This is the repository for the ITW-II Project at IIT (BHU) Varanasi - SwiftRail (Railway Management System).
 
 
 ## Setting up Development Environment
