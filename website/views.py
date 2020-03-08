@@ -1,7 +1,6 @@
 from django.shortcuts import render, redirect, reverse, render_to_response
 from django.contrib import messages
 from .models import *
-from django.db import connection
 from collections import namedtuple
 from django.views.decorators.csrf import csrf_exempt
 from django.contrib.auth.decorators import login_required
@@ -30,17 +29,6 @@ def random_with_N_digits(n):
     range_end = (10**n)-1
     return randint(range_start, range_end)
 
-
-def dictfetchall(cursor):
-    "Return all rows from a cursor as a dict"
-    columns = [col[0] for col in cursor.description]
-    return [dict(zip(columns, row)) for row in cursor.fetchall()]
-
-def namedtuplefetchall(cursor):
-    "Return all rows from a cursor as a namedtuple"
-    desc = cursor.description
-    result = namedtuple('Result', [col[0] for col in desc])
-    return [result(*row) for row in cursor.fetchall()]
 
 app_name = 'website/'
 
@@ -71,15 +59,13 @@ def pnr_status(request):
     context = {'is_submit': False}
     if request.method == "POST":
         pnr = request.POST.get('pnr')
-        with connection.cursor() as cursor:
-            cursor.execute(f"SELECT * FROM `website_ticket` INNER JOIN `website_train` ON (`website_ticket`.`train_id` = `website_train`.`train_no`) WHERE `pnr` = '{pnr}'")
-            ticket_obj = namedtuplefetchall(cursor)
+        ticket_obj = Ticket.objects.filter(pnr=pnr)
         if not ticket_obj:
             messages.error(request, 'The given PNR Number does not exist.')
         else:
             context['is_submit'] = True
             ticket_obj = ticket_obj[0]
-            train_no = ticket_obj.train_id
+            train_no = ticket_obj.train.id
             
             context['ticket'] = ticket_obj
             
