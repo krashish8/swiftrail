@@ -1,17 +1,8 @@
 from django import template
 from ..models import *
 import datetime
-from django.db import connection
-from collections import namedtuple
 
 register = template.Library()
-
-cursor = connection.cursor()
-
-def namedtuplefetchall(cursor):
-    desc = cursor.description
-    result = namedtuple('Result', [col[0] for col in desc])
-    return [result(*row) for row in cursor.fetchall()]
 
 BERTH = {
     "1A": ["LB", "UB"],
@@ -22,8 +13,7 @@ BERTH = {
 
 @register.filter
 def get_berth(obj):
-    cursor.execute(f"SELECT * FROM `website_ticket` WHERE `pnr` = '{obj.ticket_id}'")
-    ticket_obj = namedtuplefetchall(cursor)[0]
+    ticket_obj = Ticket.objects.filter(pnr=obj.ticket)[0]
     if ticket_obj.class_type == "3A" or ticket_obj.class_type == "SL":
         seat = (obj.seat_no - 1) % 8
         return BERTH["3A"][seat]
@@ -64,17 +54,15 @@ def split(obj):
 
 @register.filter
 def get_full_station_name(obj):
-    cursor.execute(f"SELECT `station_name` FROM `website_station` WHERE `station_code` = '{obj}'")
-    station_name = cursor.fetchone()[0]
+    station_name = Station.objects.filter(station_code=obj)[0]
 
     return station_name
 
 @register.filter
 def get_full_train_name(obj):
-    cursor.execute(f"SELECT `train_name` FROM `website_train` WHERE `train_no` = '{obj}'")
-    station_name = cursor.fetchone()[0]
+    train_name = Train.objects.filter(train_no=obj)[0]
 
-    return station_name
+    return train_name
 
 @register.filter
 def get_full_gender(obj):
