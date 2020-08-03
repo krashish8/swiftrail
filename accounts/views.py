@@ -6,14 +6,6 @@ from django.core.validators import validate_email
 from django.core.exceptions import ValidationError
 import datetime
 from .models import *
-from django.db import connection
-from collections import namedtuple
-
-def namedtuplefetchall(cursor):
-    "Return all rows from a cursor as a namedtuple"
-    desc = cursor.description
-    result = namedtuple('Result', [col[0] for col in desc])
-    return [result(*row) for row in cursor.fetchall()]
 
 app_name = 'accounts/'
 
@@ -96,8 +88,7 @@ def register(request):
                 messages.error(request, 'Enter a valid 10 digit phone number')
             else:
                 user = User.objects.create_user(username=username.lower(), password=password1, email=email.lower(), first_name=first_name, last_name=last_name)
-                with connection.cursor() as cursor:
-                    cursor.execute(f"INSERT INTO `accounts_profile` (`user_id`, `gender`, `phone_number`, `date_of_birth`, `address`) VALUES ('{user.id}', '{gender}', '{phone_number}', '{date_of_birth}', '{address}')")
+                profile = Profile.objects.create(user=user, gender=gender, phone_number=phone_number, date_of_birth=date_of_birth, address=address)
                 messages.success(request, 'Registration successful! Please log in.')
                 return redirect('login')
         else:
@@ -121,11 +112,9 @@ def profile(request):
                 messages.success(request, "Password successfully changed")
         else:
             messages.error(request, "Old Password entered is incorrect")
-    with connection.cursor() as cursor:
-        cursor.execute(f"SELECT * FROM `accounts_profile` INNER JOIN `auth_user` ON (`accounts_profile`.`user_id` = `auth_user`.`id`) WHERE `auth_user`.`id` = '{request.user.id}'")
-        profile_obj = namedtuplefetchall(cursor)
+    profile = Profile.objects.filter(user=request.user)
     try:
-        context['profile'] = profile_obj[0]
+        context['profile'] = profile[0]
     except IndexError:
         return redirect('create-profile')
     return render(request, app_name + 'profile.html', context=context)
@@ -152,8 +141,7 @@ def create_profile(request):
         elif not phone_number.isnumeric() or phone_number[0] < '6' or len(phone_number) != 10:
             messages.error(request, 'Enter a valid 10 digit phone number')
         else:
-            with connection.cursor() as cursor:
-                cursor.execute(f"INSERT INTO `accounts_profile` (`user_id`, `gender`, `phone_number`, `date_of_birth`, `address`) VALUES ('{request.user.id}', '{gender}', '{phone_number}', '{date_of_birth}', '{address}')")
+            Profile.objects.create(user=request.user, gender=gender, phone_number=phone_number, date_of_birth=date_of_birth, address=address)
             messages.success(request, 'Profile Successfully Created.')
             return redirect('profile')
         return render(request, app_name + 'register.html', context=context)
